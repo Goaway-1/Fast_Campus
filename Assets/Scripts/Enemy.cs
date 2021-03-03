@@ -36,11 +36,6 @@ public class Enemy : MonoBehaviour
 
     void FixedUpdate()
     {
-        if(Input.GetKeyDown(KeyCode.L)) //적의 등장
-        {
-            Appear(new Vector3(7,transform.position.y,transform.position.z));
-        }
-
         switch(CurrentState)    //현재 상태에 따른 행동들
         {
             case State.None:
@@ -118,5 +113,18 @@ public class Enemy : MonoBehaviour
         {
             Disapper(new Vector3(-15,transform.position.y,transform.position.z));
         }
+    }
+    private void OnTriggerEnter(Collider other) //상대방의 정보가 나온다.
+    {
+        Player player = other.GetComponentInParent<Player>(); //부딪친거는 박스 콜라이더니까 상위인 부모 호출
+        if (player)
+        {
+            player.OnCrash(this);   
+        }
+    }
+
+    public void OnCrash(Player player)    //내가 부딪친거
+    {
+        Debug.Log("OnCrash player = " + player);
     }
 }

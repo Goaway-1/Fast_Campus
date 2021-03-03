@@ -62,6 +62,8 @@
     <Compile Include="Assets\Resources\StarSparrow\Readme\Readme Files\Scripts\ReadmeStarSparrow.cs" />
     <Compile Include="Assets\Scripts\InputController.cs" />
     <Compile Include="Assets\Scripts\SystemManager.cs" />
+    <Compile Include="Assets\Scripts\EnemyFactory.cs" />
+    <Compile Include="Assets\Scripts\EnemyManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

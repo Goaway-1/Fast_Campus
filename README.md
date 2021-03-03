@@ -255,3 +255,115 @@ ___
     - call by refernce (참조객체)
       - ref : 이미 초기화가 끝난 상태여야 함, 외부에서 내부로 값을 전달시 사용
       - out : 초기화 안해도 상괍 없음   
+___
+## __03.03__
+> **<h3>Today Dev Story</h3>**
+  - ### __플레이어와 적기 사이의 충돌 감지__
+    - OnTriggerEnter(Collider other)를 사용해서 부딪치는 오브젝트를 감지
+      <details>
+      <summary>코드 보기</summary>
+
+      ```c#
+      private void OnTriggerEnter(Collider other) //상대방의 정보가 나온다.
+      {
+        Player player = other.GetComponentInParent<Player>(); //부딪친거는 박스 콜라이더니까 상위인 부모 호출
+        if (player)
+        {
+            player.OnCrash(this);   
+        }
+      }
+
+      public void OnCrash(Player player)    //내가 부딪친거
+      {
+        Debug.Log("OnCrash player = " + player);
+      }
+      ```
+      </details>   
+  - ### __EnemyFactory 생성__
+    - Prefabs과 Instantiate 사용 
+    - Enemy Prefab을 Dictionary의 키로 사용하여 캐싱
+    - 굳이 이렇게 하는 이유를 모르겠다.
+      <details>
+      <summary>코드 보기</summary>
+
+      ```c#
+      public const string EnemyFath = "Prefabs/Enemy";
+
+      //프리팹을 키로 사용하여 캐싱
+      Dictionary<string, GameObject> EnemyFileCache = new Dictionary<string, GameObject>();
+
+      public GameObject Load(string resourcePath)
+      {
+        GameObject go = null;
+
+        if (EnemyFileCache.ContainsKey(resourcePath))        //이미 로드되어있는 경우
+        {
+          go = EnemyFileCache[resourcePath];    //메모리 상에 올라와 있는 것을 가져온다.
+        }
+        else     
+        {
+          go = Resources.Load<GameObject>(resourcePath);  //프리팹을 메모리에 로드한다.
+          if (!go)
+          {
+            Debug.LogError("Load Error! path = " + resourcePath);
+            return null;
+          }
+
+          EnemyFileCache.Add(resourcePath, go);
+        }
+
+        GameObject instancedGo = Instantiate<GameObject>(go);
+
+        return instancedGo;
+      }
+      ```
+      </details>
+  - ### __EnemyManager 생성__
+    - EnemyFactory과 연동하여 Enemy의 생성에 직접적으로 관여한다. 
+    - List를 사용하여 모든 Enemy들을 관리
+      <details>
+      <summary>코드 보기</summary>
+
+      ```c#
+      [SerializeField]
+      EnemyFactory enemyFactory;
+
+      List<Enemy> enemies = new List<Enemy>();
+
+      private void Update()
+      {
+        if (Input.GetKeyDown(KeyCode.L)) //적의 등장
+        {
+            GenerateEnemy(new Vector3(15, 0, 0));
+        }
+      }
+
+      public bool GenerateEnemy(Vector3 position)
+      {
+        GameObject go = enemyFactory.Load(EnemyFactory.EnemyFath);  //프리펩 호출
+        if(go == null)
+        {
+          Debug.LogError("GenerateEnemy Error!");
+          return false;
+        }
+        go.transform.position = position;
+
+        Enemy enemy = go.GetComponent<Enemy>(); 
+        enemy.Appear(new Vector3(7, 0, 0));
+
+        enemies.Add(enemy);
+        return true;
+      }
+      ```
+      </details>
+> **<h3>Realization</h3>**
+  - ### __OnTriggerEnter()메서드 사용__
+    - istrigger 체크 되어있는 것만 해당 
+  - ### __자료구조__
+  - <img src="Image/DataStructure.png" height="300" title="자료구조">
+     
+    - Dictionary
+      - 큐, 스택같은 개념  
+      - 사용자가 원하는데로 키를 설정할 수 있다.  int형뿐만 아니라 문자열이나 다양한 변수형도 가능하다.
+    - List
+      - 비슷하게 활용된다.   

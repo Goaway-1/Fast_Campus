@@ -56,7 +56,20 @@ public class Player : MonoBehaviour
         {
             moveVector.y = 0;
         }
-
         return moveVector;
+    }
+
+    private void OnTriggerEnter(Collider other) //상대방의 정보가 나온다. 상대가 부딪친거
+    {
+        Enemy enemy = other.GetComponentInParent<Enemy>(); //부딪친거는 박스 콜라이더니까 상위인 부모 호출
+        if (enemy)
+        {
+            enemy.OnCrash(this);  
+        }
+    }
+
+    public void OnCrash(Enemy enemy)    //내가 부딪친거
+    {
+        Debug.Log("OnCrash enemy = " + enemy);
     }
 }
