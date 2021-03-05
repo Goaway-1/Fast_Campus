@@ -1236,6 +1236,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 1481638968581468425, guid: 010c5c807b4e2a242bef49b2b612ac51, type: 3}
+      propertyPath: BulletSpeed
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1481638968581468425, guid: 010c5c807b4e2a242bef49b2b612ac51, type: 3}
       propertyPath: MainBGQuadTransform
       value: 
       objectReference: {fileID: 303785936}

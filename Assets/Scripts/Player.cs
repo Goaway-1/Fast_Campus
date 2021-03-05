@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour
-{
+public class Player : Actor
+{  
+    //이동과 관련
     Vector3 MoveVector = Vector3.zero;
-
     float Speed = 5;
 
     [SerializeField]
@@ -14,7 +14,18 @@ public class Player : MonoBehaviour
     [SerializeField]
     Transform MainBGQuadTransform;
 
-    private void Update()
+    //총알과 관련
+    [SerializeField]
+    Transform FireTransform;
+
+    [SerializeField]
+    GameObject Bullet;
+
+    [SerializeField]
+    float BulletSpeed = 1f;
+
+
+    protected override void UpdateActor()   //Actor의 Update와 연관
     {
         UpdateMove();
     }
@@ -23,7 +34,6 @@ public class Player : MonoBehaviour
     {
         if (MoveVector.sqrMagnitude == 0)   //백터의 값이 모두 0인지 확인
             return;
-
 
         MoveVector = AdjustMoveVector(MoveVector);
 
@@ -71,5 +81,13 @@ public class Player : MonoBehaviour
     public void OnCrash(Enemy enemy)    //내가 부딪친거
     {
         Debug.Log("OnCrash enemy = " + enemy);
+    }
+
+    public void Fire()
+    {
+        GameObject go = Instantiate(Bullet);
+
+        Bullet bullet = go.GetComponent<Bullet>();
+        bullet.Fire(this, FireTransform.position, FireTransform.right, BulletSpeed, Damage);
     }
 }

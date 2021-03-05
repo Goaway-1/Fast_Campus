@@ -32,4 +32,16 @@ public class SystemManager : MonoBehaviour
         get { return player; }
     }
 
+    GamePointAccumulator gamePointAccumulator = new GamePointAccumulator();     //점수관리
+
+    public GamePointAccumulator GamePointAccumulator
+    {
+        get { return gamePointAccumulator; }
+    }
+
+    private void Awake()
+    {
+        DontDestroyOnLoad(gameObject);
+    }
+
 }

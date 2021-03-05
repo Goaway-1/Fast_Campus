@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy : MonoBehaviour
+public class Enemy : Actor
 {
     public enum State : int //int 상속
     { 
@@ -31,10 +31,24 @@ public class Enemy : MonoBehaviour
     Vector3 CurrentVelocity;
     float MoveStartTime = 0.0f; //움직이기 시작한 시간 --> 속도를 점점 증가 시키기 위함
 
-    //임시(Battle에서 Disapper로의 전환)
-    float BattleStartTime = 0.0f;   
+    //총알과 관련
+    [SerializeField]
+    Transform FireTransform;
 
-    void FixedUpdate()
+    [SerializeField]
+    GameObject Bullet;
+
+    [SerializeField]
+    float BulletSpeed = 1f;
+
+    float LastBattleUpdateTime = 0.0f;  //언제 마지막으로 싸웠노
+
+    [SerializeField]
+    int FireRemainCount = 3;    //총알의 한계
+
+    int GamePoint = 10; //게임 점수
+
+    protected override void UpdateActor()
     {
         switch(CurrentState)    //현재 상태에 따른 행동들
         {
@@ -84,7 +98,7 @@ public class Enemy : MonoBehaviour
         if (CurrentState == State.Appear)
         {
             CurrentState = State.Battle;
-            BattleStartTime = Time.time;    //배틀 시작 시간
+            LastBattleUpdateTime = Time.time;    //배틀 시작 시간
         }
         else //if (CurrentState == State.Disapper)
         {
@@ -105,13 +119,21 @@ public class Enemy : MonoBehaviour
         CurrentSpeed = 0;
 
         CurrentState = State.Disapper;
-        //MoveStartTime = Time.time;
     }
     void UpdateBattle() 
     {
-        if(Time.time - BattleStartTime > 3f)
+        if(Time.time - LastBattleUpdateTime > 1f)
         {
-            Disapper(new Vector3(-15,transform.position.y,transform.position.z));
+            if (FireRemainCount > 0)
+            {
+                Fire();
+                FireRemainCount--;
+            }
+            else
+            {
+                Disapper(new Vector3(-15, transform.position.y, transform.position.z));
+            }
+            LastBattleUpdateTime = Time.time;
         }
     }
     private void OnTriggerEnter(Collider other) //상대방의 정보가 나온다.
@@ -126,5 +148,22 @@ public class Enemy : MonoBehaviour
     public void OnCrash(Player player)    //내가 부딪친거
     {
         Debug.Log("OnCrash player = " + player);
+    }
+
+    public void Fire()
+    {
+        GameObject go = Instantiate(Bullet);
+
+        Bullet bullet = go.GetComponent<Bullet>();
+        bullet.Fire(this, FireTransform.position, -FireTransform.right, BulletSpeed, Damage);
+    }
+
+    protected override void OnDead(Actor killer)
+    {
+        base.OnDead(killer);
+
+        SystemManager.Instance.GamePointAccumulator.Accumulate(GamePoint);
+
+        CurrentState = State.Dead;
     }
 }
