@@ -2,14 +2,18 @@
   Learning on a Fast_Campus
 
 ___
+## 깨달은점
   - 메서드가 굉장히 많다.
   - 하나만 싱글톤화 하고 거기에 끌어와서 사용한다.
   - 이름이 굉장히 길다.
+  - 상속받는 개념 사용 시 Update는 한번만 사용한다.
 ___
 ## __02.27__
 > **<h3>Today Dev Story</h3>**
   - __배경의 이동__
-    - <img src="Image/BgScroller.gif" height = "300" title="배경 전환"> 
+   
+      <img src="Image/BgScroller.gif" height = "300" title="배경 전환"> 
+
     - Render의 OffsetX를 활용해서 배경의 전환 구현 
       <details>
       <summary>코드 보기</summary>
@@ -61,7 +65,9 @@ ___
       </details>
   
   - __Player의 이동__
-    - <img src="Image/PlayerMove.gif" height = "300" title="플레이어의 이동">  
+   
+      <img src="Image/PlayerMove.gif" height = "300" title="플레이어의 이동">  
+
     - Vector3를 사용하여 Player 이동 구현
     - 해당 키가 눌리면 transform.postion을 조작
      
@@ -128,7 +134,9 @@ ___
       </details> 
   
   - __Enemy 클래스 제작__
-    - <img src="Image/EnemyMove.gif" height = "300" title="배경 전환"> 
+   
+      <img src="Image/EnemyMove.gif" height = "300" title="배경 전환"> 
+
     - 상태에 따른 행동 구현 
     - 행동별로 메서드를 구분하여 접근하기 쉽게 제작
       <details>
@@ -364,7 +372,7 @@ ___
   - ### __OnTriggerEnter()메서드 사용__
     - istrigger 체크 되어있는 것만 해당 
   - ### __자료구조__
-  - <img src="Image/DataStructure.png" height="300" title="자료구조">
+    <img src="Image/DataStructure.png" height="300" title="자료구조">
      
     - Dictionary
       - 큐, 스택같은 개념  
@@ -431,7 +439,8 @@ ___
       </details> 
 
   - ### __마우스를 활요한 발사__
-    - <img src="Image/PlayerFire.gif" height=200 title="플레이어의 발사">
+      <img src="Image/PlayerFire.gif" height=200 title="플레이어의 발사">
+
     - InputController에서 SystemManager의 Player 접근 프로퍼티를 사용해서 Player의 Fire()함수 실행
       
       <details>
@@ -449,7 +458,8 @@ ___
       
       </details> 
   - ### __Enemy도 총알 발사__
-    - <img src="Image/EnemyFire.gif" height=200 title="적의 발사">
+      <img src="Image/EnemyFire.gif" height=200 title="적의 발사">
+
     - 지정된 발사 횟수가 넘으면 사라진다.
       <details>
       <summary>코드 보기</summary>
@@ -474,7 +484,8 @@ ___
       ``` 
       </details>  
   - ### __Bullet의 소멸__
-    - <img src="Image/BulletReset.gif" height=300 title="총알의 소멸">
+      <img src="Image/BulletReset.gif" height=300 title="총알의 소멸">
+
     - 시간과 포지션의 위치에 따라 사라진다. 총 2가지 조건
       <details>
       <summary>코드 보기</summary>
@@ -637,6 +648,7 @@ ___
     - GamePointAccumulator.cs --> MonoBehaviour 상속 X
       <details>
       <summary>코드 보기</summary>
+      
       ```c#
       public class GamePointAccumulator
       {
@@ -666,13 +678,335 @@ ___
     - Physics/Layer Collision Matrix
       - collider 끼리의 충돌을 관리 할때
   - DontDestroyOnLoad(gameObject) : 오브젝트가 씬이 전환되어도 파괴되지 않는다.
-  - 상속받는 개념 사용 시 Update는 한번만 사용한다.
-
   - LayCast : 끝이 없는 레이저
   - LineCast : 끝이 존재하는 레이저    
 ___
-## __03.06__
+## __03.07__
 > **<h3>Today Dev Story</h3>**
-  - null
+  - ### 엔진 출력 효과 제작
+    - Particle 사용, Enemy와 Player 모두 제작 (색상차이)
+      
+      <img src="Image/AfterBurner.gif" height=250 title="배기출력 효과">
+  - ### 폭발 효과 추가 
+    <img src="Image/HitEffect.gif" height=250 title="피격효과">
+    
+    - EffectManager 생성
+      - Effect들을 담아두고 Instantiate하는 곳
+        <details>
+        <summary>코드 보기</summary>
+      
+        ```c#
+        public class EffectManager : MonoBehaviour
+        {
+          [SerializeField]
+          GameObject[] effectPrefabs;
+
+          public GameObject GenerateEffect(int index, Vector3 position)   //생성
+          {
+            if(index < 0 || index > effectPrefabs.Length)
+            {
+              Debug.LogError("GenerateEffect error! out of range! index = " + index);
+              return null;
+            }
+            GameObject go = Instantiate<GameObject>(effectPrefabs[index], position, Quaternion.identity);
+
+            return go;
+          }
+        }
+        ```
+        </details>
+
+    - bullet과 Actor에 Effect 호출추가
+      - 피격효과 추가
+      - SystemManager를 통한 호출
+        <details>
+        <summary>코드 보기</summary>
+      
+        ```c#
+        //OnBulletCollision 메서드
+        GameObject go = SystemManager.Instance.EffectManager.GenerateEffect(0, transform.position);
+        go.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+      
+        //Actor OnDead()메서드
+        protected virtual void OnDead(Actor killer)
+        {
+          Debug.Log(name + "OnDead");
+          isDead = true;
+
+          SystemManager.Instance.EffectManager.GenerateEffect(1, transform.position);
+        }
+        ```
+        </details> 
+
+  - ### 오브젝트풀링
+    <img src="Image/BulletObjectPooling.gif " height=250 title="오브젝트풀링">
+
+    - 하나의 프리펩 캐시 시스템 제작 후 다른 클래스를 인스턴스화 해서 사용
+      ```c#
+      PrefabsCacheData EffectCacheData = new PrefabsCacheData;
+      PrefabsCacheData EnemyCacheData = new PrefabsCacheData;
+      ...
+      ```
+    - instantiate 부하를 줄이기 위함
+    - Enemy, Bullet, Effect 총 3가지 구현, MonoBehaviour를 상속 X
+    - __PrefabCacheSystem__ 작성
+      - 모든 오브젝트풀링을 관리하는 곳 
+        <details>
+        <summary>코드 보기</summary>
+        
+        ```c#
+        //PrefabCacheSystem.cs
+        [System.Serializable]
+        public class PrefabsCacheData   //prefab의 데이터 ->총알,몬스터 등등
+        {
+          public string filePath;
+          public int cacheCount;
+        }
+
+        public class PrefabCacheSystem 
+        {
+          Dictionary<string, Queue<GameObject>> Caches = new Dictionary<string, Queue<GameObject>>(); //이중 저장 여러가지의 타입
+
+          public void GenerateCache(string filePath,GameObject gameObject, int cacheCount)    //초기 생성
+          {
+            if (Caches.ContainsKey(filePath))
+            {
+              Debug.Log("Already cache generated! filePath = " + filePath);
+              return;
+            }
+            else
+            {
+              Queue<GameObject> queue = new Queue<GameObject>();
+              for (int i = 0; i < cacheCount; i++)
+              {
+                GameObject go = Object.Instantiate<GameObject>(gameObject); //object에 있음 Bemonohavor를 상속하지 않아서
+                go.SetActive(false);
+                queue.Enqueue(go);  //넣어준다.
+              }
+
+              Caches.Add(filePath, queue);
+            }
+          }
+
+          public GameObject Archive(string filePath)  //할당
+          {
+            if (!Caches.ContainsKey(filePath))  //키값이 없을때
+            {
+              Debug.LogError("Archive Error! no Cache Generated! FilePath = " + filePath);
+              return null;
+            }
+        
+            if(Caches[filePath].Count == 0) //생성된 수가 0개 일때
+            {
+              Debug.LogError("Archive problem! not Enough Count!");
+              return null;
+            }
+
+            GameObject go = Caches[filePath].Dequeue(); //정보들을 넘긴다.
+            go.SetActive(true);
+
+            return go;
+          }
+
+          public bool Restore(string filePath, GameObject gameObject) //반납
+          {
+            if (!Caches.ContainsKey(filePath))
+            {
+              Debug.LogError("Restore Error! no Cache Generated! FilePath = " + filePath);
+              return false;
+            }
+
+            gameObject.SetActive(false);
+
+            Caches[filePath].Enqueue(gameObject);   
+            return true;
+          }
+        }
+        ```
+        </details> 
+    - ### __Enemy__ 캐싱
+      - EnemyManager.cs에 캐시 정보 추가 및 Instantitate 삭제
+      - EnemyFactory 에서는 적재만 진행
+        <details>
+        <summary>코드 보기</summary>
+        
+        ```c#
+        //EnemyManager.cs
+        [SerializeField]
+        PrefabsCacheData[] enemyFiles;  //배열로 생성
+
+        private void Start()
+        {
+          Prepare();
+        }
+
+        private void Update()
+        {
+          if (Input.GetKeyDown(KeyCode.L)) //적의 등장
+          {
+            GenerateEnemy(0, new Vector3(15, 0, 0));
+          }
+        }
+
+        public bool GenerateEnemy(int index,Vector3 position)   //만들어줘라
+        {
+          string filePath = enemyFiles[index].filePath;
+          GameObject go = SystemManager.Instance.EnemyCacheSystem.Archive(filePath);  //프리펩 호출
+
+          go.transform.position = position;
+
+          Enemy enemy = go.GetComponent<Enemy>();
+          enemy.FilePath = filePath;
+          enemy.Appear(new Vector3(7, 0, 0));
+
+          enemies.Add(enemy);
+          return true;
+        }
+
+        public bool RemoveEnemy(Enemy enemy)    //삭제해라
+        {
+          if (!enemies.Contains(enemy))   //키값이 아니라 이 오브젝트가 없다면
+          {
+            Debug.LogError("No exist Enemy");
+            return false;
+          }
+          enemies.Remove(enemy);
+          SystemManager.Instance.EnemyCacheSystem.Restore(enemy.FilePath, enemy.gameObject);
+
+          return true;
+        }
+
+        public void Prepare()   //초기 단체 생성
+        {
+          for (int i = 0; i < enemyFiles.Length; i++)
+          {
+            GameObject go = enemyFactory.Load(enemyFiles[i].filePath);
+            SystemManager.Instance.EnemyCacheSystem.GenerateCache(enemyFiles[i].filePath, go, enemyFiles[i].cacheCount);
+          }
+        }
+        ```
+        </details> 
+
+    - ### __Bullet__ 캐싱
+      
+      <img src="Image/BulletManager.png" height=250 title="BulletManager">
+
+      - Player, Enemy 링크 제거, 파일로 로드
+      - EnemyManager와 비슷
+      - BulletManager 생성, Bullet에 FilePath 추가, Player,Enemy의 발사 수정
+        <details>
+        <summary>코드 보기</summary>
+        
+        ```c#
+        //BulletManager.cs
+        public const int PlayerBulletIndex = 0;
+        public const int EnemyBulletIndex = 1;
+
+        //캐싱관련
+        [SerializeField]
+        PrefabsCacheData[] bulletFiles;
+
+        Dictionary<string, GameObject> FileCache = new Dictionary<string, GameObject>();
+
+        private void Start()
+        {
+          Prepare();
+        }
+
+        public GameObject Load(string resourcePath) //EnemyFactory의 Load와 유사
+        {
+          GameObject go = null;
+
+          if (FileCache.ContainsKey(resourcePath)) //캐시가 있다면
+          {
+            go = FileCache[resourcePath];
+          }
+          else        //캐시가 없다면 
+          {
+            go = Resources.Load<GameObject>(resourcePath);
+            if (!go)
+            {
+              Debug.LogError("Load Error! path = " + resourcePath);
+              return null;
+            }
+            FileCache.Add(resourcePath, go);
+          }
+          return go;
+        }
+
+        public void Prepare()
+        {
+          for (int i = 0; i < bulletFiles.Length; i++)
+          {
+            GameObject go = Load(bulletFiles[i].filePath);
+            SystemManager.Instance.BulletCacheSystem.GenerateCache(bulletFiles[i].filePath, go, bulletFiles[i].cacheCount);
+          }
+        } 
+
+        public Bullet Generate(int index)
+        {
+          string filePath = bulletFiles[index].filePath;
+          GameObject go = SystemManager.Instance.BulletCacheSystem.Archive(filePath);
+
+          Bullet bullet = go.GetComponent<Bullet>();
+          bullet.FilePath = filePath;
+
+          return bullet;
+        }
+
+        public bool Remove(Bullet bullet)
+        {
+          SystemManager.Instance.BulletCacheSystem.Restore(bullet.FilePath, bullet.gameObject);
+          return true;
+        }
+        ```
+        ```c#
+        //Player의 총알 발사
+        public void Fire()
+        {
+          Bullet bullet = SystemManager.Instance.BulletManager.Generate(BulletManager.PlayerBulletIndex);
+          bullet.Fire(this, FireTransform.position, FireTransform.right, BulletSpeed, Damage);
+        }
+        ```
+        </details>  
+       
+    - ### __Effect__ 캐싱
+      - AutoCachableEffect.cs 생성 -> Effect가 끝나면 소멸(반납)
+        <details>
+        <summary>코드 보기</summary>
+
+        ```c#
+        [RequireComponent(typeof(ParticleSystem))]
+        public class AutoCachableEffect : MonoBehaviour
+        {
+          public string FilePath
+          {
+            get; set;
+          }
+
+          private void OnEnable()
+          {
+            StartCoroutine("CheckIfAlive");
+          }
+
+          IEnumerator CheckIfAlive()  
+          {
+            while (true)
+            {
+              yield return new WaitForSeconds(0.5f);
+              if (!GetComponent<ParticleSystem>().IsAlive(true))  //끝났다면 종료하기 위함
+              {
+                SystemManager.Instance.EffectManager.RemoveEffect(this);
+                break;
+              }
+            }
+          }
+        }
+        ```
+        </details>  
+      - EffectManager 수정
+        - [Bullet Manager와 유사](#Bullet-캐시)
+
 > **<h3>Realization</h3>**
-  - null
+  - Particle System
+    - 임펙트를 만드는데 사용되는 컴포넌트

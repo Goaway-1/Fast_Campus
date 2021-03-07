@@ -26,6 +26,12 @@ public class Bullet : MonoBehaviour
     //현재 문제의 아이
     Actor Owner;
 
+    //캐싱관련
+    public string FilePath
+    {
+        get; set;
+    }
+
     private void FixedUpdate()
     {
         if (ProcessDisapperCondition())
@@ -90,13 +96,15 @@ public class Bullet : MonoBehaviour
 
         actor.OnBulletHited(Owner, Damage);
 
-
         Collider myCollider = GetComponentInChildren<Collider>();
         myCollider.enabled = false;
 
         Hited = true;
         NeedMove = false;
 
+        //이펙트 추가
+        GameObject go = SystemManager.Instance.EffectManager.GenerateEffect(EffectManager.BulletDisapperFxIndex, transform.position);
+        go.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
         Disapper();
     }
 
@@ -123,6 +131,6 @@ public class Bullet : MonoBehaviour
 
     void Disapper()
     {
-        Destroy(gameObject);
+        SystemManager.Instance.BulletManager.Remove(this);
     }
 }

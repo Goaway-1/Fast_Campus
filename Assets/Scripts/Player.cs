@@ -74,20 +74,23 @@ public class Player : Actor
         Enemy enemy = other.GetComponentInParent<Enemy>(); //부딪친거는 박스 콜라이더니까 상위인 부모 호출
         if (enemy)
         {
-            enemy.OnCrash(this);  
+            enemy.OnCrash(this, crashDamage);  
         }
     }
 
-    public void OnCrash(Enemy enemy)    //내가 부딪친거
+    public override void OnCrash(Actor attacker, int damage)    //내가 부딪친거
     {
-        Debug.Log("OnCrash enemy = " + enemy);
+        base.OnCrash(attacker, damage);
     }
 
     public void Fire()
     {
-        GameObject go = Instantiate(Bullet);
-
-        Bullet bullet = go.GetComponent<Bullet>();
+        Bullet bullet = SystemManager.Instance.BulletManager.Generate(BulletManager.PlayerBulletIndex);
         bullet.Fire(this, FireTransform.position, FireTransform.right, BulletSpeed, Damage);
+    }
+    protected override void OnDead(Actor killer)
+    {
+        base.OnDead(killer);
+        gameObject.SetActive(false);
     }
 }

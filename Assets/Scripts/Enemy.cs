@@ -48,6 +48,12 @@ public class Enemy : Actor
 
     int GamePoint = 10; //게임 점수
 
+    //캐시 관련
+    public string FilePath
+    {
+        get; set;
+    }
+
     protected override void UpdateActor()
     {
         switch(CurrentState)    //현재 상태에 따른 행동들
@@ -141,20 +147,18 @@ public class Enemy : Actor
         Player player = other.GetComponentInParent<Player>(); //부딪친거는 박스 콜라이더니까 상위인 부모 호출
         if (player)
         {
-            player.OnCrash(this);   
+            player.OnCrash(this,crashDamage);   
         }
     }
 
-    public void OnCrash(Player player)    //내가 부딪친거
+    public override void OnCrash(Actor attacker, int damage)    //내가 부딪친거
     {
-        Debug.Log("OnCrash player = " + player);
+        base.OnCrash(attacker, damage);
     }
 
     public void Fire()
     {
-        GameObject go = Instantiate(Bullet);
-
-        Bullet bullet = go.GetComponent<Bullet>();
+        Bullet bullet = SystemManager.Instance.BulletManager.Generate(BulletManager.EnemyBulletIndex);
         bullet.Fire(this, FireTransform.position, -FireTransform.right, BulletSpeed, Damage);
     }
 
@@ -163,6 +167,7 @@ public class Enemy : Actor
         base.OnDead(killer);
 
         SystemManager.Instance.GamePointAccumulator.Accumulate(GamePoint);
+        SystemManager.Instance.EnemyManager.RemoveEnemy(this);
 
         CurrentState = State.Dead;
     }

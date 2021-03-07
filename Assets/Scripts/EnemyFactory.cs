@@ -26,11 +26,8 @@ public class EnemyFactory : MonoBehaviour
                 return null;
             }
 
-            EnemyFileCache.Add(resourcePath, go);
+            EnemyFileCache.Add(resourcePath, go);   //캐시에 적재만한다.
         }
-
-        GameObject instancedGo = Instantiate<GameObject>(go);
-
-        return instancedGo;
+        return go;
     }
 }
