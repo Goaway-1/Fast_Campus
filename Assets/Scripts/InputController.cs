@@ -35,7 +35,7 @@ public class InputController : MonoBehaviour
 
     void UpdateMouse()
     {
-        if(Input.GetMouseButtonDown(1))
+        if(Input.GetMouseButtonDown(0))
         {
             SystemManager.Instance.Hero.Fire();
         }

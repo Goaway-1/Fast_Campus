@@ -59,7 +59,7 @@ public class Actor : MonoBehaviour
         DecreaseHP(attacker,damage);
     }
 
-    private void DecreaseHP(Actor attacker, int value)  //체력 감소 (외불 호출 X)
+    protected virtual void DecreaseHP(Actor attacker, int value)  //체력 감소 (외불 호출 X)
     {
         if (isDead)
             return;

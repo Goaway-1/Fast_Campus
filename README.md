@@ -1010,3 +1010,137 @@ ___
 > **<h3>Realization</h3>**
   - Particle System
     - 임펙트를 만드는데 사용되는 컴포넌트
+___
+## __03.08__
+> **<h3>Today Dev Story</h3>**
+  - uGUI로 정보 표현
+    - Player HP 표현
+     
+      <img src="Image/DecreaseHp.gif" height=250 title="BulletManager">
+
+      - Slider 사용, Gage.cs 생성
+      - Actor 수정(DecreaseHP()를 virtual로) 
+        <details>
+        <summary>코드 보기</summary>
+
+        ```c#
+        public class Gage : MonoBehaviour
+        {
+          [SerializeField]
+          Slider slider;
+
+          public void SetHP(float currentValue, float MaxValue)
+          {
+            if (currentValue > MaxValue)
+              currentValue = MaxValue;
+
+            slider.value = currentValue / MaxValue;
+          }
+        }
+        ```
+        </details>   
+    - 패널,매니저 클래스 제작
+      - BasePanel 클래스 (상위 클래스)
+      - 상속 받은 Panel들은 Awake,OnDestory 메서드를 사용해서는 안된다.
+        <details><summary>코드 보기</summary>
+
+        ```c#
+        private void Awake()
+        {
+          InitializePanel();
+        }
+
+        private void OnDestroy()    //파괴될때
+        {
+          DestroyPanel();
+        }
+
+        private void OnGUI()    //매프레임 호출
+        {
+          if (GUILayout.Button("Close"))  //버튼생성과 동시에 버튼을 누른다면
+          {
+            Close();
+          }
+        }
+        public virtual void InitializePanel()   //초기 생성
+        {  
+          PanelManager.RegistPanel(GetType(), this);
+        }
+        public virtual void DestroyPanel()  //삭제
+        { 
+          PanelManager.UnregistPanel(GetType());  //GetType 쓰면 자식이 나온다.
+        }
+        public virtual void Show()
+        {
+          gameObject.SetActive(true);
+        }
+        public virtual void Close()
+        {
+          gameObject.SetActive(false);
+        }
+        ```
+        </details> 
+
+      - PanelManager 생성
+        - Canvas에 배치
+        - Panel들을 저장하고 관리 
+          <details><summary>코드 보기</summary>
+
+          ```c#
+          public class PanelManager : MonoBehaviour
+          {
+            //패널들을 저장
+            static Dictionary<Type, BasePanel> Panels = new Dictionary<Type, BasePanel>();
+
+            //패널 등록
+            public static bool RegistPanel(Type PanelClassType, BasePanel basePanel)
+            {
+              if (Panels.ContainsKey(PanelClassType)) //같은 타입의 창은 존재하지 않는다.
+              {
+                Debug.LogError("RegistPanel Error! Already exist Type! PanelClassType = " + PanelClassType.ToString());
+                return false;
+              }
+
+              Debug.Log("RegistPanel is called! Type = " + PanelClassType.ToString() + ", basePanel" + basePanel.name);
+
+              Panels.Add(PanelClassType, basePanel);
+              return true;
+            }
+
+            public static bool UnregistPanel(Type PanelClassType)   //삭제
+            {
+              if (!Panels.ContainsKey(PanelClassType))
+              {
+                Debug.LogError("UnregistPanel Error! Can't Found Type! PanelClassType = " + PanelClassType.ToString());
+                return false;
+              }
+
+              Panels.Remove(PanelClassType);  //Dictionary 내부 함수
+              return true;
+            }
+
+            public static BasePanel GetPanel(Type PanelClassType)   //추출
+            {
+              if (!Panels.ContainsKey(PanelClassType))
+              {
+                Debug.LogError("GetPanel Error! Can't Found Type! PanelClassType = " + PanelClassType.ToString());
+                return null;
+              }
+
+              return Panels[PanelClassType];  //타입의 이름으로 호출
+            }
+          }
+          ```
+          </details>  
+> **<h3>Realization</h3>**
+  - GUI
+    - 레거시 UI : 기본 UI, 코드에 의해 사용
+    - ezGUI : 오래된 라이브러리, 구매를 해야했음
+    - NGUI : 외부 라이브러리, 구매를 해야했음
+    - uGUI : 유니티에서 제공하는 UI
+      - Panel 단위로 구성하면 관리에 용이
+      - RectTransform 사용
+      - Anchor Presets 사용아형 간편하게 정렬
+    - Panel
+      - 창의 공통적인 동작을 구현한 클래스를 만들어서 사용하고 상속 
+  - GetType() : 나의 타입을 반환한다.

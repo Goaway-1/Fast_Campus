@@ -24,6 +24,15 @@ public class Player : Actor
     [SerializeField]
     float BulletSpeed = 1f;
 
+    //HP
+    [SerializeField]
+    Gage HPGage;
+
+    protected override void Initialize()
+    {
+        base.Initialize();
+        HPGage.SetHP(CurrentHP, MaxHP); //초기화
+    }
 
     protected override void UpdateActor()   //Actor의 Update와 연관
     {
@@ -88,6 +97,12 @@ public class Player : Actor
         Bullet bullet = SystemManager.Instance.BulletManager.Generate(BulletManager.PlayerBulletIndex);
         bullet.Fire(this, FireTransform.position, FireTransform.right, BulletSpeed, Damage);
     }
+    protected override void DecreaseHP(Actor attacker, int value)
+    {
+        base.DecreaseHP(attacker, value);
+        HPGage.SetHP(CurrentHP, MaxHP);
+    }
+
     protected override void OnDead(Actor killer)
     {
         base.OnDead(killer);
