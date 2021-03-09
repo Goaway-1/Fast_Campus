@@ -47,19 +47,19 @@ public class Actor : MonoBehaviour
 
     }
 
-    public virtual void OnBulletHited(Actor attacker, int damage)   //총알에 피격시
+    public virtual void OnBulletHited(Actor attacker, int damage, Vector3 hitPos)   //총알에 피격시
     {
         Debug.Log("OnBulletHited damage = " + damage);
-        DecreaseHP(attacker,damage);
+        DecreaseHP(attacker,damage,hitPos);
     }
 
-    public virtual void OnCrash(Actor attacker,int damage)     //기체에 피격시
+    public virtual void OnCrash(Actor attacker,int damage, Vector3 crashPos)     //기체에 피격시
     {
         Debug.Log("OnCrash damage = " + damage);
-        DecreaseHP(attacker,damage);
+        DecreaseHP(attacker,damage, crashPos);
     }
 
-    protected virtual void DecreaseHP(Actor attacker, int value)  //체력 감소 (외불 호출 X)
+    protected virtual void DecreaseHP(Actor attacker, int value, Vector3 damagePos)  //체력 감소 (외불 호출 X)
     {
         if (isDead)
             return;

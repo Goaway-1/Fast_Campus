@@ -16,10 +16,10 @@ public class BasePanel : MonoBehaviour
 
     private void OnGUI()    //매프레임 호출
     {
-        if (GUILayout.Button("What"))  //버튼생성과 동시에 버튼을 누른다면
-        {
-            Close();
-        }
+        //if (GUILayout.Button("Canel"))  //버튼생성과 동시에 버튼을 누른다면
+        //{
+        //    Close();
+        //}
     }
     public virtual void InitializePanel()   //초기 생성
     {

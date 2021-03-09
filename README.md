@@ -1015,7 +1015,7 @@ ___
 > **<h3>Today Dev Story</h3>**
   - uGUI로 정보 표현
     - Player HP 표현
-     
+      
       <img src="Image/DecreaseHp.gif" height=250 title="BulletManager">
 
       - Slider 사용, Gage.cs 생성
@@ -1041,7 +1041,7 @@ ___
         </details>   
     - 패널,매니저 클래스 제작
       - BasePanel 클래스 (상위 클래스)
-      - 상속 받은 Panel들은 Awake,OnDestory 메서드를 사용해서는 안된다.
+      - 상속 받은 Panel들은 Awake,OnDestory 메서드를 사용해서는 안된다. 또한 자동으로 Dictionary에 저장된다. 호출시 PanelManager에서 호출하여 사용한다.
         <details><summary>코드 보기</summary>
 
         ```c#
@@ -1131,6 +1131,11 @@ ___
             }
           }
           ```
+          ```c#
+          //이렇게 사용한다.
+          PlayerStatePanel playerStatePanel = PanelManager.GetPanel(typeof(PlayerStatePanel)) as PlayerStatePanel;
+          playerStatePanel.SetHP(CurrentHP, MaxHP);
+          ```
           </details>  
 > **<h3>Realization</h3>**
   - GUI
@@ -1144,3 +1149,257 @@ ___
     - Panel
       - 창의 공통적인 동작을 구현한 클래스를 만들어서 사용하고 상속 
   - GetType() : 나의 타입을 반환한다.
+___
+## __03.09__
+> **<h3>Today Dev Story</h3>**
+  - ### PlayerStatePanel 작성
+    
+    <img src="Image/PlayerPanel.gif" height=250 title="PlayerPanel">
+
+    - BasePanel을 상속
+    - 점수와 HP를 표시 (Player, GamePointAccumulator 수정)
+    - Panel이니까 PanelManager에서 GetPanel을 호출하여 사용
+      <details><summary>코드 보기</summary>
+
+      ```c#
+      public class PlayerStatePanel : BasePanel
+      {
+        [SerializeField]
+        Text scoreValue;
+
+        [SerializeField]
+        Gage HPGage;
+
+        public void SetScore(int value)     //점수 설정
+        {
+          Debug.Log("SetScore value = " + value);
+
+          scoreValue.text = value.ToString();
+        }
+
+        public void SetHP(float currentValue, float maxValue)   //HP설정
+        {
+          HPGage.SetHP(currentValue, maxValue);
+        }
+      }
+      ```
+      ```c#
+      //이렇게 사용한다.
+      PlayerStatePanel playerStatePanel = PanelManager.GetPanel(typeof(PlayerStatePanel)) as PlayerStatePanel;
+      playerStatePanel.SetScore(gamePoint);
+      ```
+      </details>
+  - ### 총알 데미지 화면에 표시
+
+    <img src="Image/DamageShow.gif" height=250 title="DamageShow">
+
+    - DamageManager, SystemManager에 DamageCacheSystem 추가 
+      
+      <details><summary>코드 보기</summary>
+
+      ```c#
+      public class DamageManager : MonoBehaviour
+      {
+        //추후 수정
+        public const int EnemyDamageIndex = 0;
+        public const int PlayerDamageIndex = 0;
+
+        [SerializeField]
+        Transform canvasTransform;
+
+        [SerializeField]
+        Canvas canvas;
+
+        [SerializeField]
+        PrefabsCacheData[] Files;
+
+        Dictionary<string, GameObject> FileCache = new Dictionary<string, GameObject>();
+
+        void Start()
+        {
+          Prepare();
+        }
+        
+        public GameObject Load(string resourcePath)     //동일
+        {
+          GameObject go = null;
+          if (FileCache.ContainsKey(resourcePath))
+          {
+            go = FileCache[resourcePath];
+          }
+          else
+          {
+            go = Resources.Load<GameObject>(resourcePath);
+            if (!go)
+            {
+              Debug.LogError("Load Error! path : " + resourcePath);
+              return null;
+            }
+
+            FileCache.Add(resourcePath, go);
+          }
+          return go;
+        }
+
+        public void Prepare()
+        {
+          for (int i = 0; i < Files.Length; i++)
+          {
+            GameObject go = Load(Files[i].filePath);
+            SystemManager.Instance.DamageCacheSystem.GenerateCache(Files[i].filePath, go, Files[i].cacheCount, canvasTransform);
+          }
+        }
+
+        public GameObject Generate(int index, Vector3 position, int damageValue)
+        {
+          if (index < 0 || index >= Files.Length)
+          {
+            Debug.LogError("Generate Error! out of range! index = " + index);
+            return null;
+          }
+          string filePath = Files[index].filePath;
+          GameObject go = SystemManager.Instance.DamageCacheSystem.Archive(filePath);
+          go.transform.position = Camera.main.WorldToScreenPoint(position);
+          //go.transform.position = position;
+
+          UIDamage damage = go.GetComponent<UIDamage>();
+          damage.FilePath = filePath;
+          damage.ShowDamage(damageValue);
+
+          return go;
+        }
+
+        public bool Remove(UIDamage damage)
+        {
+          SystemManager.Instance.DamageCacheSystem.Restore(damage.FilePath, damage.gameObject);
+          return true;
+        }
+      }
+      ```
+      ```c#
+      //PrefabCacheSystem.cs
+      public void GenerateCache(string filePath,GameObject gameObject, int cacheCount, Transform parentTransform = null);
+      
+      //Player.cs -> DecraseHP
+      SystemManager.Instance.DamageManager.Generate(DamageManager.PlayerDamageIndex, transform.position + Random.insideUnitSphere * 0.5f, value);
+      ```
+      </details> 
+
+    - UIDamage.cs, 프리펩 생성(Canvas에서 생성)
+      
+      <details><summary>코드 보기</summary>
+
+      ```c#
+      public class UIDamage : MonoBehaviour
+      {
+        enum DamageState : int
+        {
+          None = 0,
+          SizeUp,
+          Display,
+           FadeOut
+        }
+
+        [SerializeField]
+        DamageState damageState = DamageState.None;
+
+        //각 시간 진행기간
+        const float SizeUpDuration = 0.1f;
+        const float DisplayDuration = 0.5f;
+        const float FadeOutDuration = 0.2f;
+
+        [SerializeField]
+        Text damageText;    
+
+        Vector3 CurrentVelocity;    //SmoothDamp 사용시 사용
+
+        //시작 시간 저장용
+        float DisplayStartTime;
+        float FadeOutStartTime;
+          
+        public string FilePath
+        {
+          get; set;
+        }
+
+        private void Update()
+        {
+          UpdateDamage();
+        }
+
+        private void OnGUI()
+        {
+          if (GUILayout.Button("Show"))
+          {
+            ShowDamage(9999);
+          }
+        }
+
+        public void ShowDamage(int damage)
+        {
+          damageText.text = damage.ToString();
+          Reset();
+          damageState = DamageState.SizeUp;   //보여지기 시작
+        }
+
+        void Reset()
+        {
+          transform.localScale = Vector3.zero;    //사이즈가 0
+          Color newColor = damageText.color;
+          newColor.a = 1.0f;                      //투명도 1
+          damageText.color = newColor;
+        }
+        
+        void UpdateDamage()
+        {
+          if (damageState == DamageState.None)
+            return;
+
+          switch (damageState)
+          {
+            case DamageState.SizeUp:
+              transform.localScale = Vector3.SmoothDamp(transform.localScale, Vector3.one, ref CurrentVelocity, SizeUpDuration);
+
+              if(transform.localScale == Vector3.one)
+              {
+                damageState = DamageState.Display;
+                DisplayStartTime = Time.time;
+              }
+              break;
+            case DamageState.Display:
+              if(Time.time - DisplayStartTime > DisplayDuration)
+              {
+                damageState = DamageState.FadeOut;
+                FadeOutStartTime = Time.time;
+              }
+              break;
+            case DamageState.FadeOut:
+              Color newColor = damageText.color;
+              newColor.a = Mathf.Lerp(1, 0, (Time.time - FadeOutStartTime) / FadeOutDuration);    //1~0으로 투명값 조절
+              damageText.color = newColor;
+
+              if (newColor.a == 0)
+              {
+                damageState = DamageState.None;
+                SystemManager.Instance.DamageManager.Remove(this);
+              }
+              break;
+          }
+        }
+      }
+      ```
+      </details>
+       
+    - PreFabCacheSystem의 GenerateCache인자를 부모 Transform을 받을 수 있도록 확장 후 전달 (캔버스 밑에 있기 때문에)
+    - 캔버스는 3D 위치를 화면 위치로 해야함
+    - DamageManager의 Generate 메소드에서 데미지 UI의 위치값을 넣어줄때 WorldToScreenPoint로 변환해서 넘겨줘야 정상적으로 출력된다. 
+    - Player, Enemy의 DecreaseHp에서 사용
+  
+  - 데미지 출력 잔여 관리
+    - 기타 등등 수정 
+> **<h3>Realization</h3>** 
+  - 3D 위치를 화면 위치
+    - Camera.main.WorldToScreenPoint
+  - Instantiate(오브젝트,위치)
+  - Random.insideUnitSphere * 0.5f
+    - 구체 반경 0.5인 곳의 점을 선택

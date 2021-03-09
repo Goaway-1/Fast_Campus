@@ -15,11 +15,11 @@ D:/Unity Projects/Fast_Campus
 -logFile
 Logs/AssetImportWorker0.log
 -srvPort
-49824
+51181
 Successfully changed project path to: D:/Unity Projects/Fast_Campus
 D:/Unity Projects/Fast_Campus
 Using Asset Import Pipeline V2.
-Refreshing native plugins compatible for Editor in 65.25 ms, found 0 plugins.
+Refreshing native plugins compatible for Editor in 41.65 ms, found 0 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Initialize engine version: 2020.2.0f1 (3721df5a8b28)
 [Subsystems] Discovering subsystems at path D:/Unity/2020.2.0f1/Editor/Data/Resources/UnitySubsystems
@@ -37,54 +37,364 @@ Initialize mono
 Mono path[0] = 'D:/Unity/2020.2.0f1/Editor/Data/Managed'
 Mono path[1] = 'D:/Unity/2020.2.0f1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit'
 Mono config path = 'D:/Unity/2020.2.0f1/Editor/Data/MonoBleedingEdge/etc'
-Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56764
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56728
 Begin MonoManager ReloadAssembly
 Registering precompiled unity dll's ...
 Register platform support module: D:/Unity/2020.2.0f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
 Register platform support module: D:/Unity/2020.2.0f1/Editor/Data/PlaybackEngines/LinuxStandaloneSupport/UnityEditor.LinuxStandalone.Extensions.dll
-Registered in 0.002166 seconds.
+Registered in 0.001877 seconds.
 Native extension for LinuxStandalone target not found
 Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 36.86 ms, found 0 plugins.
+Refreshing native plugins compatible for Editor in 54.17 ms, found 0 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Invoked RoslynAnalysisRunner static constructor.
 RoslynAnalysisRunner will not be running.
 RoslynAnalysisRunner has terminated.
 Mono: successfully reloaded assembly
-- Completed reload, in  2.438 seconds
+- Completed reload, in  3.648 seconds
 Platform modules already initialized, skipping
 Registering precompiled user dll's ...
-Registered in 0.000814 seconds.
+Registered in 0.001272 seconds.
 Begin MonoManager ReloadAssembly
 Native extension for LinuxStandalone target not found
 Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 0.34 ms, found 0 plugins.
+Refreshing native plugins compatible for Editor in 0.37 ms, found 0 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Invoked RoslynAnalysisRunner static constructor.
 RoslynAnalysisRunner will not be running.
 RoslynAnalysisRunner has terminated.
 Mono: successfully reloaded assembly
-- Completed reload, in  1.918 seconds
+- Completed reload, in  2.295 seconds
 Platform modules already initialized, skipping
 ========================================================================
 Worker process is ready to serve import requests
 Shader 'WFX/Transparent Diffuse': fallback shader 'Particles/Alpha Blended' not found
 Shader 'WFX/Transparent Specular': fallback shader 'Particles/Alpha Blended' not found
-Launched and connected shader compiler UnityShaderCompiler.exe after 0.18 seconds
-Refreshing native plugins compatible for Editor in 0.32 ms, found 0 plugins.
+Launched and connected shader compiler UnityShaderCompiler.exe after 0.27 seconds
+Refreshing native plugins compatible for Editor in 0.35 ms, found 0 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 1138 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 1139 Unused Serialized files (Serialized files now loaded: 0)
 System memory in use before: 61.9 MB.
 System memory in use after: 62.0 MB.
 
-Unloading 10 unused Assets to reduce memory usage. Loaded Objects now: 1585.
-Total: 2.390300 ms (FindLiveObjects: 0.158600 ms CreateObjectMapping: 0.045300 ms MarkObjects: 2.089000 ms  DeleteObjects: 0.096200 ms)
+Unloading 10 unused Assets to reduce memory usage. Loaded Objects now: 1586.
+Total: 4.643800 ms (FindLiveObjects: 1.157300 ms CreateObjectMapping: 0.453400 ms MarkObjects: 2.838600 ms  DeleteObjects: 0.192500 ms)
 
 ========================================================================
 Received Import Request.
-  path: Assets/Scripts/Actor.cs
-  artifactKey: Guid(fe1c8c848c3f7c64db03539cf7d10319) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Scripts/Actor.cs using Guid(fe1c8c848c3f7c64db03539cf7d10319) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '4454798c126ee8ee61775adfb0ccf2ee') in 0.105395 seconds
-  Import took 0.132439 seconds .
+  path: Assets/Scripts/BasePanel.cs
+  artifactKey: Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/BasePanel.cs using Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'f870a67b7066a3a887332e413f482799') in 0.114049 seconds
+  Import took 0.154941 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 4.445351 seconds.
+  path: Assets/Scripts/BasePanel.cs
+  artifactKey: Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/BasePanel.cs using Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'f870a67b7066a3a887332e413f482799') in 0.048983 seconds
+  Import took 0.080720 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 132.037875 seconds.
+  path: Assets/Scripts/BasePanel.cs
+  artifactKey: Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/BasePanel.cs using Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '874031ed36e05f2d0dbc27debfe90d3a') in 0.013742 seconds
+  Import took 0.018411 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 27.443106 seconds.
+  path: Assets/Scripts/BasePanel.cs
+  artifactKey: Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/BasePanel.cs using Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'fd92112da15a19a6a02dd0dd69e92884') in 0.014900 seconds
+  Import took 0.020442 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.001413 seconds.
+  path: Assets/Scripts/BasePanel.cs
+  artifactKey: Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/BasePanel.cs using Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'fd92112da15a19a6a02dd0dd69e92884') in 0.013498 seconds
+  Import took 0.017514 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 9.586123 seconds.
+  path: Assets/Scripts/BasePanel.cs
+  artifactKey: Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/BasePanel.cs using Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '38f21af15d1ab3ed8481f4f134ae12a0') in 0.025429 seconds
+  Import took 0.032948 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 197.184207 seconds.
+  path: Assets/Scripts/BasePanel.cs
+  artifactKey: Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/BasePanel.cs using Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '407f0dc9135a7d0b8356ca0beedcfc42') in 0.012830 seconds
+  Import took 0.033831 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 24.150315 seconds.
+  path: Assets/Scripts/BasePanel.cs
+  artifactKey: Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/BasePanel.cs using Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'd9f3f51519584e8d92b1b448149b993f') in 0.010529 seconds
+  Import took 0.013620 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 3.897151 seconds.
+  path: Assets/Scripts/BasePanel.cs
+  artifactKey: Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/BasePanel.cs using Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'dc1cab45d191dd32d9bb19b76d68b6e7') in 0.014504 seconds
+  Import took 0.020605 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 16.531797 seconds.
+  path: Assets/Scripts/BasePanel.cs
+  artifactKey: Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/BasePanel.cs using Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '3d9e263d5c9fb94bea4214c6200ab8dc') in 0.014776 seconds
+  Import took 0.020654 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 10.607857 seconds.
+  path: Assets/Scripts/BasePanel.cs
+  artifactKey: Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/BasePanel.cs using Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '2f54b0fc5754eb44246ecbedc95a7d55') in 0.018479 seconds
+  Import took 0.022184 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 8.229438 seconds.
+  path: Assets/Scripts/BasePanel.cs
+  artifactKey: Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/BasePanel.cs using Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '3ff829d95fe6ba359993e4926aa71d4c') in 0.005588 seconds
+  Import took 0.012310 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 19.967805 seconds.
+  path: Assets/Scripts/BasePanel.cs
+  artifactKey: Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/BasePanel.cs using Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '36b7f07c7aedaf4e96c7fc8cf41b0562') in 0.016038 seconds
+  Import took 0.021768 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 40.494060 seconds.
+  path: Assets/Scripts/BasePanel.cs
+  artifactKey: Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/BasePanel.cs using Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '018366562096bb55da05ae00664c0772') in 0.018443 seconds
+  Import took 0.025578 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 12.106617 seconds.
+  path: Assets/Scripts/BasePanel.cs
+  artifactKey: Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/BasePanel.cs using Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '551335d37b174e5eb68f2ced20143c8e') in 0.016020 seconds
+  Import took 0.019425 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 103.991583 seconds.
+  path: Assets/Scripts/BasePanel.cs
+  artifactKey: Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/BasePanel.cs using Guid(eaf7da286df7c0348ae74707df374181) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'c9caede23cebd49d4049e780901e7e87') in 0.016383 seconds
+  Import took 0.019617 seconds .
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.001469 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for LinuxStandalone target not found
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.35 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+Mono: successfully reloaded assembly
+- Completed reload, in  1.607 seconds
+Platform modules already initialized, skipping
+Shader 'WFX/Transparent Diffuse': fallback shader 'Particles/Alpha Blended' not found
+Shader 'WFX/Transparent Specular': fallback shader 'Particles/Alpha Blended' not found
+Refreshing native plugins compatible for Editor in 0.31 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 1123 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 61.3 MB.
+System memory in use after: 61.4 MB.
+
+Unloading 5 unused Assets to reduce memory usage. Loaded Objects now: 1588.
+Total: 2.249800 ms (FindLiveObjects: 0.138100 ms CreateObjectMapping: 0.040500 ms MarkObjects: 2.020200 ms  DeleteObjects: 0.049500 ms)
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.001695 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for LinuxStandalone target not found
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 7.84 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+Mono: successfully reloaded assembly
+- Completed reload, in  1.426 seconds
+Platform modules already initialized, skipping
+Shader 'WFX/Transparent Diffuse': fallback shader 'Particles/Alpha Blended' not found
+Shader 'WFX/Transparent Specular': fallback shader 'Particles/Alpha Blended' not found
+Refreshing native plugins compatible for Editor in 0.41 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 1123 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 61.6 MB.
+System memory in use after: 61.6 MB.
+
+Unloading 5 unused Assets to reduce memory usage. Loaded Objects now: 1590.
+Total: 6.110700 ms (FindLiveObjects: 0.283000 ms CreateObjectMapping: 0.053400 ms MarkObjects: 5.657900 ms  DeleteObjects: 0.114300 ms)
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.001025 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for LinuxStandalone target not found
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.31 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+Mono: successfully reloaded assembly
+- Completed reload, in  1.361 seconds
+Platform modules already initialized, skipping
+Shader 'WFX/Transparent Diffuse': fallback shader 'Particles/Alpha Blended' not found
+Shader 'WFX/Transparent Specular': fallback shader 'Particles/Alpha Blended' not found
+Refreshing native plugins compatible for Editor in 0.52 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 1123 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 61.8 MB.
+System memory in use after: 61.9 MB.
+
+Unloading 5 unused Assets to reduce memory usage. Loaded Objects now: 1592.
+Total: 2.800400 ms (FindLiveObjects: 0.165800 ms CreateObjectMapping: 0.043600 ms MarkObjects: 2.431400 ms  DeleteObjects: 0.158300 ms)
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.001450 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for LinuxStandalone target not found
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.33 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+Mono: successfully reloaded assembly
+- Completed reload, in  1.209 seconds
+Platform modules already initialized, skipping
+Shader 'WFX/Transparent Diffuse': fallback shader 'Particles/Alpha Blended' not found
+Shader 'WFX/Transparent Specular': fallback shader 'Particles/Alpha Blended' not found
+Refreshing native plugins compatible for Editor in 0.34 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 1123 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 62.1 MB.
+System memory in use after: 62.2 MB.
+
+Unloading 5 unused Assets to reduce memory usage. Loaded Objects now: 1594.
+Total: 3.190900 ms (FindLiveObjects: 0.238200 ms CreateObjectMapping: 0.064600 ms MarkObjects: 2.818000 ms  DeleteObjects: 0.068100 ms)
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.000910 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for LinuxStandalone target not found
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.41 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+Mono: successfully reloaded assembly
+- Completed reload, in  1.376 seconds
+Platform modules already initialized, skipping
+Shader 'WFX/Transparent Diffuse': fallback shader 'Particles/Alpha Blended' not found
+Shader 'WFX/Transparent Specular': fallback shader 'Particles/Alpha Blended' not found
+Refreshing native plugins compatible for Editor in 0.31 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 1123 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 62.4 MB.
+System memory in use after: 62.4 MB.
+
+Unloading 5 unused Assets to reduce memory usage. Loaded Objects now: 1596.
+Total: 2.228600 ms (FindLiveObjects: 0.153600 ms CreateObjectMapping: 0.037600 ms MarkObjects: 1.945600 ms  DeleteObjects: 0.090500 ms)
+
+========================================================================
+Received Import Request.
+  Time since last request: 648.581677 seconds.
+  path: Assets/Scripts/PanelManager.cs
+  artifactKey: Guid(d03c1e104cc64f6439d0933feb1087d1) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/PanelManager.cs using Guid(d03c1e104cc64f6439d0933feb1087d1) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '8e4a4694f966b084b4210ba314e06705') in 0.022921 seconds
+  Import took 0.027336 seconds .
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.000948 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for LinuxStandalone target not found
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.45 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+Mono: successfully reloaded assembly
+- Completed reload, in  1.193 seconds
+Platform modules already initialized, skipping
+Shader 'WFX/Transparent Diffuse': fallback shader 'Particles/Alpha Blended' not found
+Shader 'WFX/Transparent Specular': fallback shader 'Particles/Alpha Blended' not found
+Refreshing native plugins compatible for Editor in 0.29 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 1124 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 62.6 MB.
+System memory in use after: 62.7 MB.
+
+Unloading 5 unused Assets to reduce memory usage. Loaded Objects now: 1599.
+Total: 2.188700 ms (FindLiveObjects: 0.150000 ms CreateObjectMapping: 0.057400 ms MarkObjects: 1.867200 ms  DeleteObjects: 0.113000 ms)
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.002305 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for LinuxStandalone target not found
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.31 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+Mono: successfully reloaded assembly
+- Completed reload, in  1.569 seconds
+Platform modules already initialized, skipping
+Shader 'WFX/Transparent Diffuse': fallback shader 'Particles/Alpha Blended' not found
+Shader 'WFX/Transparent Specular': fallback shader 'Particles/Alpha Blended' not found
+Refreshing native plugins compatible for Editor in 0.33 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 1124 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 62.8 MB.
+System memory in use after: 62.9 MB.
+
+Unloading 5 unused Assets to reduce memory usage. Loaded Objects now: 1601.
+Total: 1.955300 ms (FindLiveObjects: 0.230500 ms CreateObjectMapping: 0.111900 ms MarkObjects: 1.560000 ms  DeleteObjects: 0.051200 ms)
 
 AssetImportWorkerClient::OnTransportError - code=2 error=End of file

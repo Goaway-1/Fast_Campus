@@ -56,6 +56,14 @@ public class SystemManager : MonoBehaviour
         get { return bulletManager; }
     }
 
+    [SerializeField]
+    DamageManager damageManager;
+
+    public DamageManager DamageManager
+    {
+        get { return damageManager; }
+    }
+
     GamePointAccumulator gamePointAccumulator = new GamePointAccumulator();     //점수관리
 
     public GamePointAccumulator GamePointAccumulator
@@ -67,6 +75,7 @@ public class SystemManager : MonoBehaviour
     PrefabCacheSystem enemyCacheSystem = new PrefabCacheSystem();   //적
     PrefabCacheSystem bulletCacheSystem = new PrefabCacheSystem();  //총알
     PrefabCacheSystem effectCacheSystem = new PrefabCacheSystem();  //효과
+    PrefabCacheSystem damageCacheSystem = new PrefabCacheSystem();  //효과
 
     public PrefabCacheSystem EnemyCacheSystem
     {
@@ -79,6 +88,10 @@ public class SystemManager : MonoBehaviour
     public PrefabCacheSystem EffectCacheSystem
     {
         get { return effectCacheSystem; }
+    }
+    public PrefabCacheSystem DamageCacheSystem
+    {
+        get { return damageCacheSystem; }
     }
     //캐싱관련 3가지 종료
 

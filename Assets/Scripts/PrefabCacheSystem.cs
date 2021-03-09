@@ -13,7 +13,7 @@ public class PrefabCacheSystem
 {
     Dictionary<string, Queue<GameObject>> Caches = new Dictionary<string, Queue<GameObject>>(); //이중 저장 여러가지의 타입
 
-    public void GenerateCache(string filePath,GameObject gameObject, int cacheCount)    //초기 생성
+    public void GenerateCache(string filePath,GameObject gameObject, int cacheCount, Transform parentTransform = null)    //초기 생성
     {
         if (Caches.ContainsKey(filePath))
         {
@@ -25,7 +25,7 @@ public class PrefabCacheSystem
             Queue<GameObject> queue = new Queue<GameObject>();
             for (int i = 0; i < cacheCount; i++)
             {
-                GameObject go = Object.Instantiate<GameObject>(gameObject); //object에 있음 Bemonohavor를 상속하지 않아서
+                GameObject go = Object.Instantiate<GameObject>(gameObject,parentTransform); //object에 있음 Bemonohavor를 상속하지 않아서
                 go.SetActive(false);
                 queue.Enqueue(go);  //넣어준다.
             }

@@ -147,13 +147,20 @@ public class Enemy : Actor
         Player player = other.GetComponentInParent<Player>(); //부딪친거는 박스 콜라이더니까 상위인 부모 호출
         if (player)
         {
-            player.OnCrash(this,crashDamage);   
+            if (!player.IsDead)
+            {
+                BoxCollider box = ((BoxCollider)other);
+                Vector3 crashPos = player.transform.position + box.center;
+                crashPos.x += box.size.x * 0.5f;
+
+                player.OnCrash(this, crashDamage, crashPos);
+            }
         }
     }
 
-    public override void OnCrash(Actor attacker, int damage)    //내가 부딪친거
+    public override void OnCrash(Actor attacker, int damage, Vector3 crachPos)    //내가 부딪친거
     {
-        base.OnCrash(attacker, damage);
+        base.OnCrash(attacker, damage, crachPos);
     }
 
     public void Fire()
@@ -170,5 +177,13 @@ public class Enemy : Actor
         SystemManager.Instance.EnemyManager.RemoveEnemy(this);
 
         CurrentState = State.Dead;
+    }
+
+    protected override void DecreaseHP(Actor attacker, int value, Vector3 damagePos)
+    {
+        base.DecreaseHP(attacker, value, damagePos);
+
+        Vector3 damagePoint = damagePos + Random.insideUnitSphere * 0.5f;
+        SystemManager.Instance.DamageManager.Generate(DamageManager.EnemyDamageIndex, damagePoint, value, Color.magenta);
     }
 }

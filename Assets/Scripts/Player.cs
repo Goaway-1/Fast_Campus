@@ -24,14 +24,12 @@ public class Player : Actor
     [SerializeField]
     float BulletSpeed = 1f;
 
-    //HP
-    [SerializeField]
-    Gage HPGage;
 
     protected override void Initialize()
     {
         base.Initialize();
-        HPGage.SetHP(CurrentHP, MaxHP); //초기화
+        PlayerStatePanel playerStatePanel = PanelManager.GetPanel(typeof(PlayerStatePanel)) as PlayerStatePanel;
+        playerStatePanel.SetHP(CurrentHP, MaxHP);   //초기화
     }
 
     protected override void UpdateActor()   //Actor의 Update와 연관
@@ -83,13 +81,20 @@ public class Player : Actor
         Enemy enemy = other.GetComponentInParent<Enemy>(); //부딪친거는 박스 콜라이더니까 상위인 부모 호출
         if (enemy)
         {
-            enemy.OnCrash(this, crashDamage);  
+            if (!enemy.IsDead)
+            {
+                BoxCollider box = ((BoxCollider)other);
+                Vector3 crashPos = enemy.transform.position + box.center;
+                crashPos.x += box.size.x * 0.5f;
+
+                enemy.OnCrash(this, crashDamage, crashPos);
+            }
         }
     }
 
-    public override void OnCrash(Actor attacker, int damage)    //내가 부딪친거
+    public override void OnCrash(Actor attacker, int damage, Vector3 crashPos)    //내가 부딪친거
     {
-        base.OnCrash(attacker, damage);
+        base.OnCrash(attacker, damage, crashPos);
     }
 
     public void Fire()
@@ -97,10 +102,15 @@ public class Player : Actor
         Bullet bullet = SystemManager.Instance.BulletManager.Generate(BulletManager.PlayerBulletIndex);
         bullet.Fire(this, FireTransform.position, FireTransform.right, BulletSpeed, Damage);
     }
-    protected override void DecreaseHP(Actor attacker, int value)
+    protected override void DecreaseHP(Actor attacker, int value, Vector3 damagePos)
     {
-        base.DecreaseHP(attacker, value);
-        HPGage.SetHP(CurrentHP, MaxHP);
+        base.DecreaseHP(attacker, value, damagePos);
+        //반환시 BasePanel이 반환되기 때문에 as PlayerStatePanel로 변환해줌
+        PlayerStatePanel playerStatePanel = PanelManager.GetPanel(typeof(PlayerStatePanel)) as PlayerStatePanel;
+        playerStatePanel.SetHP(CurrentHP, MaxHP);
+
+        Vector3 damagePoint = damagePos + Random.insideUnitSphere * 0.5f;
+        SystemManager.Instance.DamageManager.Generate(DamageManager.PlayerDamageIndex, damagePoint, value, Color.red);
     }
 
     protected override void OnDead(Actor killer)
