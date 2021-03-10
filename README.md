@@ -11,9 +11,7 @@ ___
 ## __02.27__
 > **<h3>Today Dev Story</h3>**
   - __배경의 이동__
-   
-      <img src="Image/BgScroller.gif" height = "300" title="배경 전환"> 
-
+    - <img src="Image/BgScroller.gif" height = "300" title="배경 전환"> 
     - Render의 OffsetX를 활용해서 배경의 전환 구현 
       <details>
       <summary>코드 보기</summary>
@@ -65,9 +63,7 @@ ___
       </details>
   
   - __Player의 이동__
-   
-      <img src="Image/PlayerMove.gif" height = "300" title="플레이어의 이동">  
-
+    - <img src="Image/PlayerMove.gif" height = "300" title="플레이어의 이동">  
     - Vector3를 사용하여 Player 이동 구현
     - 해당 키가 눌리면 transform.postion을 조작
      
@@ -134,9 +130,7 @@ ___
       </details> 
   
   - __Enemy 클래스 제작__
-   
-      <img src="Image/EnemyMove.gif" height = "300" title="배경 전환"> 
-
+    - <img src="Image/EnemyMove.gif" height = "300" title="배경 전환"> 
     - 상태에 따른 행동 구현 
     - 행동별로 메서드를 구분하여 접근하기 쉽게 제작
       <details>
@@ -372,8 +366,7 @@ ___
   - ### __OnTriggerEnter()메서드 사용__
     - istrigger 체크 되어있는 것만 해당 
   - ### __자료구조__
-    <img src="Image/DataStructure.png" height="300" title="자료구조">
-     
+    - <img src="Image/DataStructure.png" height="300" title="자료구조">
     - Dictionary
       - 큐, 스택같은 개념  
       - 사용자가 원하는데로 키를 설정할 수 있다.  int형뿐만 아니라 문자열이나 다양한 변수형도 가능하다.
@@ -439,8 +432,7 @@ ___
       </details> 
 
   - ### __마우스를 활요한 발사__
-      <img src="Image/PlayerFire.gif" height=200 title="플레이어의 발사">
-
+    - <img src="Image/PlayerFire.gif" height=200 title="플레이어의 발사">
     - InputController에서 SystemManager의 Player 접근 프로퍼티를 사용해서 Player의 Fire()함수 실행
       
       <details>
@@ -458,8 +450,7 @@ ___
       
       </details> 
   - ### __Enemy도 총알 발사__
-      <img src="Image/EnemyFire.gif" height=200 title="적의 발사">
-
+    - <img src="Image/EnemyFire.gif" height=200 title="적의 발사">
     - 지정된 발사 횟수가 넘으면 사라진다.
       <details>
       <summary>코드 보기</summary>
@@ -484,8 +475,7 @@ ___
       ``` 
       </details>  
   - ### __Bullet의 소멸__
-      <img src="Image/BulletReset.gif" height=300 title="총알의 소멸">
-
+    - <img src="Image/BulletReset.gif" height=300 title="총알의 소멸">
     - 시간과 포지션의 위치에 따라 사라진다. 총 2가지 조건
       <details>
       <summary>코드 보기</summary>
@@ -685,11 +675,9 @@ ___
 > **<h3>Today Dev Story</h3>**
   - ### 엔진 출력 효과 제작
     - Particle 사용, Enemy와 Player 모두 제작 (색상차이)
-      
-      <img src="Image/AfterBurner.gif" height=250 title="배기출력 효과">
+    - <img src="Image/AfterBurner.gif" height=250 title="배기출력 효과">
   - ### 폭발 효과 추가 
-    <img src="Image/HitEffect.gif" height=250 title="피격효과">
-    
+    - <img src="Image/HitEffect.gif" height=250 title="피격효과">
     - EffectManager 생성
       - Effect들을 담아두고 Instantiate하는 곳
         <details>
@@ -739,8 +727,7 @@ ___
         </details> 
 
   - ### 오브젝트풀링
-    <img src="Image/BulletObjectPooling.gif " height=250 title="오브젝트풀링">
-
+    - <img src="Image/BulletObjectPooling.gif " height=250 title="오브젝트풀링">
     - 하나의 프리펩 캐시 시스템 제작 후 다른 클래스를 인스턴스화 해서 사용
       ```c#
       PrefabsCacheData EffectCacheData = new PrefabsCacheData;
@@ -888,9 +875,7 @@ ___
         </details> 
 
     - ### __Bullet__ 캐싱
-      
-      <img src="Image/BulletManager.png" height=250 title="BulletManager">
-
+      - <img src="Image/BulletManager.png" height=250 title="BulletManager">
       - Player, Enemy 링크 제거, 파일로 로드
       - EnemyManager와 비슷
       - BulletManager 생성, Bullet에 FilePath 추가, Player,Enemy의 발사 수정
@@ -1015,9 +1000,7 @@ ___
 > **<h3>Today Dev Story</h3>**
   - uGUI로 정보 표현
     - Player HP 표현
-      
-      <img src="Image/DecreaseHp.gif" height=250 title="BulletManager">
-
+      - <img src="Image/DecreaseHp.gif" height=250 title="BulletManager">
       - Slider 사용, Gage.cs 생성
       - Actor 수정(DecreaseHP()를 virtual로) 
         <details>
@@ -1153,9 +1136,7 @@ ___
 ## __03.09__
 > **<h3>Today Dev Story</h3>**
   - ### PlayerStatePanel 작성
-    
-    <img src="Image/PlayerPanel.gif" height=250 title="PlayerPanel">
-
+    - <img src="Image/PlayerPanel.gif" height=250 title="PlayerPanel">
     - BasePanel을 상속
     - 점수와 HP를 표시 (Player, GamePointAccumulator 수정)
     - Panel이니까 PanelManager에서 GetPanel을 호출하여 사용
@@ -1190,9 +1171,7 @@ ___
       ```
       </details>
   - ### 총알 데미지 화면에 표시
-
-    <img src="Image/DamageShow.gif" height=250 title="DamageShow">
-
+    - <img src="Image/DamageShow.gif" height=250 title="DamageShow">
     - DamageManager, SystemManager에 DamageCacheSystem 추가 
       
       <details><summary>코드 보기</summary>
@@ -1395,7 +1374,7 @@ ___
     - DamageManager의 Generate 메소드에서 데미지 UI의 위치값을 넣어줄때 WorldToScreenPoint로 변환해서 넘겨줘야 정상적으로 출력된다. 
     - Player, Enemy의 DecreaseHp에서 사용
   
-  - 데미지 출력 잔여 관리
+  - ### 데미지 출력 잔여 관리
     - 기타 등등 수정 
 > **<h3>Realization</h3>** 
   - 3D 위치를 화면 위치
@@ -1403,3 +1382,85 @@ ___
   - Instantiate(오브젝트,위치)
   - Random.insideUnitSphere * 0.5f
     - 구체 반경 0.5인 곳의 점을 선택
+___
+## __03.10__
+> **<h3>Today Dev Story</h3>**
+  - ### 적 비행기 편대 비행 제작
+    1. SquadronManager.cs 만들기
+        - <img src="Image/SquadronManager.png" height=250 title="SquadronManager">
+        - 일정 시간이 지나면 Squadron생성
+        - 트리거 사용  
+        - SquadronData 작성
+          <details><summary>코드 보기</summary>
+          
+          ```c#
+          [System.Serializable]
+          public class SquadronData
+          {
+            public float SquadronGenerateTime;      //시간이 되면
+            public Squadron squadron;               //이 스쿼드론 생성
+          }
+
+          public class SquadronManager : MonoBehaviour
+          {
+            float GameStartedTime;  //시작시간
+
+            int SquadronIndex;      //몇개만들껀디
+
+            [SerializeField]
+            SquadronData[] squadronDatas;
+
+            bool running = false;   //게임 실행중?
+
+            private void Update()
+            {
+              if (Input.GetKeyDown(KeyCode.K))
+              {
+                StartGame();
+              }
+              CheckSquadronGeneratings();
+            }
+
+            public void StartGame() //게임 시작
+            {
+              GameStartedTime = Time.time;
+              SquadronIndex = 0;
+              running = true;
+              Debug.Log("Game Started!");
+            }
+
+            void CheckSquadronGeneratings() //생성을 체크
+            {
+              if (!running)
+                return;
+
+              if(Time.time - GameStartedTime >= squadronDatas[SquadronIndex].SquadronGenerateTime)
+              {
+                GenerateSquadron(squadronDatas[SquadronIndex]);
+                SquadronIndex++;
+
+                if (SquadronIndex >= squadronDatas.Length)
+                {
+                  AllSquadronGenerated();
+                  return;
+                }
+              }
+            }
+            void GenerateSquadron(SquadronData data)    //스쿼드론 생성(임시)
+            {
+              Debug.Log("GenerateSquadron");
+            }
+            void AllSquadronGenerated() //모든 스쿼드론 종료(임시)
+            {
+              Debug.Log("AllSquadronGenerated");
+
+              running = false;
+            }
+          }
+          ```
+          </details> 
+    2. Squadron  
+        - EnemyGenerateDate 클래스 추가
+        - GenerateAllData 메서드 추가  
+> **<h3>Realization</h3>**   
+  - 

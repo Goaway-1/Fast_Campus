@@ -79,7 +79,9 @@
     <Compile Include="Assets\Scripts\Actor.cs" />
     <Compile Include="Assets\Resources\StarSparrow\Readme\Readme Files\Scripts\ReadmeStarSparrow.cs" />
     <Compile Include="Assets\JMO Assets\WarFX\Scripts\CFX_AutoDestructShuriken.cs" />
+    <Compile Include="Assets\Scripts\PlayerStatePanel.cs" />
     <Compile Include="Assets\JMO Assets\WarFX\Demo\Assets\CFX_AutoStopLoopedEffect.cs" />
+    <Compile Include="Assets\Scripts\DamageManager.cs" />
     <Compile Include="Assets\Scripts\PrefabCacheSystem.cs" />
     <Compile Include="Assets\Scripts\EnemyManager.cs" />
     <Compile Include="Assets\Scripts\EnemyFactory.cs" />
@@ -88,9 +90,9 @@
     <Compile Include="Assets\Scripts\BulletManager.cs" />
     <Compile Include="Assets\Scripts\InputController.cs" />
     <Compile Include="Assets\Scripts\SystemManager.cs" />
-    <Compile Include="Assets\Scripts\PlayerStatePanel.cs" />
     <Compile Include="Assets\Scripts\UIDamage.cs" />
-    <Compile Include="Assets\Scripts\DamageManager.cs" />
+    <Compile Include="Assets\Scripts\Squadron.cs" />
+    <Compile Include="Assets\Scripts\SquadronManager.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\JMO Assets\WarFX\Shaders\WFX_S Multiply Soft.shader" />
