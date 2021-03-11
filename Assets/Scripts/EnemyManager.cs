@@ -25,22 +25,17 @@ public class EnemyManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.L)) //적의 등장
-        {
-            GenerateEnemy(0, new Vector3(15, 0, 0));
-        }
     }
 
-    public bool GenerateEnemy(int index,Vector3 position)   //만들어줘라
+    public bool GenerateEnemy(EnemyGenerateData data)   //만들어줘라
     {
-        string filePath = enemyFiles[index].filePath;
-        GameObject go = SystemManager.Instance.EnemyCacheSystem.Archive(filePath);  //프리펩 호출
+        GameObject go = SystemManager.Instance.EnemyCacheSystem.Archive(data.FilePath);  //프리펩 호출
 
-        go.transform.position = position;
+        go.transform.position = data.GeneratePoint;
 
         Enemy enemy = go.GetComponent<Enemy>();
-        enemy.FilePath = filePath;
-        enemy.Appear(new Vector3(7, 0, 0));
+        enemy.FilePath = data.FilePath;
+        enemy.Reset(data);
 
         enemies.Add(enemy);
         return true;

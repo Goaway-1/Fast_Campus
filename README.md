@@ -432,7 +432,7 @@ ___
       </details> 
 
   - ### __마우스를 활요한 발사__
-    - <img src="Image/PlayerFire.gif" height=200 title="플레이어의 발사">
+    - <img src="Image/PlayerFire.gif" height="200" title="플레이어의 발사">
     - InputController에서 SystemManager의 Player 접근 프로퍼티를 사용해서 Player의 Fire()함수 실행
       
       <details>
@@ -450,7 +450,7 @@ ___
       
       </details> 
   - ### __Enemy도 총알 발사__
-    - <img src="Image/EnemyFire.gif" height=200 title="적의 발사">
+    - <img src="Image/EnemyFire.gif" height="200" title="적의 발사">
     - 지정된 발사 횟수가 넘으면 사라진다.
       <details>
       <summary>코드 보기</summary>
@@ -475,7 +475,7 @@ ___
       ``` 
       </details>  
   - ### __Bullet의 소멸__
-    - <img src="Image/BulletReset.gif" height=300 title="총알의 소멸">
+    - <img src="Image/BulletReset.gif" height="300" title="총알의 소멸">
     - 시간과 포지션의 위치에 따라 사라진다. 총 2가지 조건
       <details>
       <summary>코드 보기</summary>
@@ -675,9 +675,10 @@ ___
 > **<h3>Today Dev Story</h3>**
   - ### 엔진 출력 효과 제작
     - Particle 사용, Enemy와 Player 모두 제작 (색상차이)
-    - <img src="Image/AfterBurner.gif" height=250 title="배기출력 효과">
+    - <img src="Image/AfterBurner.gif" height="250"
+    -  title="배기출력 효과">
   - ### 폭발 효과 추가 
-    - <img src="Image/HitEffect.gif" height=250 title="피격효과">
+    - <img src="Image/HitEffect.gif" height="250" title="피격효과">
     - EffectManager 생성
       - Effect들을 담아두고 Instantiate하는 곳
         <details>
@@ -727,7 +728,7 @@ ___
         </details> 
 
   - ### 오브젝트풀링
-    - <img src="Image/BulletObjectPooling.gif " height=250 title="오브젝트풀링">
+    - <img src="Image/BulletObjectPooling.gif " height="250" title="오브젝트풀링">
     - 하나의 프리펩 캐시 시스템 제작 후 다른 클래스를 인스턴스화 해서 사용
       ```c#
       PrefabsCacheData EffectCacheData = new PrefabsCacheData;
@@ -875,7 +876,7 @@ ___
         </details> 
 
     - ### __Bullet__ 캐싱
-      - <img src="Image/BulletManager.png" height=250 title="BulletManager">
+      - <img src="Image/BulletManager.png" heigth="200" title="BulletManager">
       - Player, Enemy 링크 제거, 파일로 로드
       - EnemyManager와 비슷
       - BulletManager 생성, Bullet에 FilePath 추가, Player,Enemy의 발사 수정
@@ -1000,7 +1001,7 @@ ___
 > **<h3>Today Dev Story</h3>**
   - uGUI로 정보 표현
     - Player HP 표현
-      - <img src="Image/DecreaseHp.gif" height=250 title="BulletManager">
+      - <img src="Image/DecreaseHp.gif" height="250" title="BulletManager">
       - Slider 사용, Gage.cs 생성
       - Actor 수정(DecreaseHP()를 virtual로) 
         <details>
@@ -1136,7 +1137,7 @@ ___
 ## __03.09__
 > **<h3>Today Dev Story</h3>**
   - ### PlayerStatePanel 작성
-    - <img src="Image/PlayerPanel.gif" height=250 title="PlayerPanel">
+    - <img src="Image/PlayerPanel.gif" height="250" title="PlayerPanel">
     - BasePanel을 상속
     - 점수와 HP를 표시 (Player, GamePointAccumulator 수정)
     - Panel이니까 PanelManager에서 GetPanel을 호출하여 사용
@@ -1171,7 +1172,7 @@ ___
       ```
       </details>
   - ### 총알 데미지 화면에 표시
-    - <img src="Image/DamageShow.gif" height=250 title="DamageShow">
+    - <img src="Image/DamageShow.gif" height="250" title="DamageShow">
     - DamageManager, SystemManager에 DamageCacheSystem 추가 
       
       <details><summary>코드 보기</summary>
@@ -1387,7 +1388,7 @@ ___
 > **<h3>Today Dev Story</h3>**
   - ### 적 비행기 편대 비행 제작
     1. SquadronManager.cs 만들기
-        - <img src="Image/SquadronManager.png" height=250 title="SquadronManager">
+        - <img src="Image/SquadronManager.png" height="250" title="SquadronManager">
         - 일정 시간이 지나면 Squadron생성
         - 트리거 사용  
         - SquadronData 작성
@@ -1463,4 +1464,83 @@ ___
         - EnemyGenerateDate 클래스 추가
         - GenerateAllData 메서드 추가  
 > **<h3>Realization</h3>**   
-  - 
+  - null
+___
+## __03.10__
+> **<h3>Today Dev Story</h3>**
+  - ### 대형을 유지하는 적기 생성 
+  - <img src="Image/Squadron.gif" height="350" title="squadron"> 
+  - ### enemy 변경
+    - Reset추가 (기존 설정 방식을 수정)
+        <details><summary>코드 보기</summary>
+
+        ```c#
+        public void Reset(EnemyGenerateData data)
+        {
+          CurrentHP = MaxHP = data.MaxHp;
+          Damage = data.Damage;
+          crashDamage = data.CrashDamage;
+          BulletSpeed = data.BulletSpeed;
+          FireRemainCount = data.FireRemainCount;
+          GamePoint = data.GamePoint;
+
+          AppearPoint = data.AppearPoint;
+          DisappearPoint = data.DisappearPoint;
+
+          CurrentState = State.Ready;
+          LastActionUpdateTime = Time.time;
+        }
+        ```
+        </details> 
+  - ### EnemyManager 수정
+    - 기존생성이 삭제 Squadron에서 생성 
+      <details><summary>코드 보기</summary>
+
+      ```c#
+      public bool GenerateEnemy(EnemyGenerateData data)   //만들어줘라
+      {
+        GameObject go = SystemManager.Instance.EnemyCacheSystem.Archive(data.FilePath);  //프리펩 호출
+
+        go.transform.position = data.GeneratePoint;
+
+        Enemy enemy = go.GetComponent<Enemy>();
+        enemy.FilePath = data.FilePath;
+        enemy.Reset(data);
+
+        enemies.Add(enemy);
+        return true;
+      }
+      ```
+      </details> 
+  - ### Squadron 수정
+    - <img src="Image/Squadron.png" height="350" title="Squadron"> 
+    - 각각의 스쿼드론을 관리
+      <details><summary>코드 보기</summary>
+
+      ```c#
+      public class Squadron : MonoBehaviour
+      {
+        [SerializeField]
+        EnemyGenerateData[] enemyGenerateDatas;
+
+        void GenerateAllData()
+        {
+          for (int i = 0; i < enemyGenerateDatas.Length; i++)
+          {
+            SystemManager.Instance.EnemyManager.GenerateEnemy(enemyGenerateDatas[i]);
+          }
+        }
+      }
+      ```
+
+      ```c#
+      //SquadronManger.cs
+      void GenerateSquadron(SquadronData data)    //스쿼드론 생성
+      {
+        Debug.Log("GenerateSquadron");
+        data.squadron.GenerateAllData();
+      }
+      ```
+      </details> 
+> **<h3>Realization</h3>**   
+  - null

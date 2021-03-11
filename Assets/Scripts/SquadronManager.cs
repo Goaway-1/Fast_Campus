@@ -57,8 +57,10 @@ public class SquadronManager : MonoBehaviour
     void GenerateSquadron(SquadronData data)    //스쿼드론 생성
     {
         Debug.Log("GenerateSquadron");
+        data.squadron.GenerateAllData();
     }
-    void AllSquadronGenerated() //모든 스쿼드론 종료
+
+    void AllSquadronGenerated() //모든 스쿼드론 생성
     {
         Debug.Log("AllSquadronGenerated");
 

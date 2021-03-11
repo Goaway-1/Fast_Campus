@@ -41,7 +41,7 @@ public class Enemy : Actor
     [SerializeField]
     float BulletSpeed = 1f;
 
-    float LastBattleUpdateTime = 0.0f;  //언제 마지막으로 싸웠노
+    float LastActionUpdateTime = 0.0f;  //언제 마지막으로 싸웠노
 
     [SerializeField]
     int FireRemainCount = 3;    //총알의 한계
@@ -54,12 +54,17 @@ public class Enemy : Actor
         get; set;
     }
 
+    Vector3 AppearPoint;        //입장시 도착 위치
+    Vector3 DisappearPoint;     //퇴장시 목표 위치
+
     protected override void UpdateActor()
     {
         switch(CurrentState)    //현재 상태에 따른 행동들
         {
             case State.None:
+                break;
             case State.Ready:
+                UpdateReady();  //
                 break;
 
             case State.Dead:
@@ -104,13 +109,31 @@ public class Enemy : Actor
         if (CurrentState == State.Appear)
         {
             CurrentState = State.Battle;
-            LastBattleUpdateTime = Time.time;    //배틀 시작 시간
+            LastActionUpdateTime = Time.time;    //배틀 시작 시간
         }
         else //if (CurrentState == State.Disapper)
         {
             CurrentState = State.None;
+            SystemManager.Instance.EnemyManager.RemoveEnemy(this);
         }
     }
+
+    public void Reset(EnemyGenerateData data)
+    {
+        CurrentHP = MaxHP = data.MaxHp;
+        Damage = data.Damage;
+        crashDamage = data.CrashDamage;
+        BulletSpeed = data.BulletSpeed;
+        FireRemainCount = data.FireRemainCount;
+        GamePoint = data.GamePoint;
+
+        AppearPoint = data.AppearPoint;
+        DisappearPoint = data.DisappearPoint;
+
+        CurrentState = State.Ready;
+        LastActionUpdateTime = Time.time;
+    }
+
     public void Appear(Vector3 targetPos)   //등장
     {
         TargetPostion = targetPos;
@@ -126,9 +149,16 @@ public class Enemy : Actor
 
         CurrentState = State.Disapper;
     }
+    void UpdateReady()
+    {
+        if(Time.time - LastActionUpdateTime > 1.0f)
+        {
+            Appear(AppearPoint);
+        }
+    }
     void UpdateBattle() 
     {
-        if(Time.time - LastBattleUpdateTime > 1f)
+        if(Time.time - LastActionUpdateTime > 1f)
         {
             if (FireRemainCount > 0)
             {
@@ -137,9 +167,9 @@ public class Enemy : Actor
             }
             else
             {
-                Disapper(new Vector3(-15, transform.position.y, transform.position.z));
+                Disapper(DisappearPoint);
             }
-            LastBattleUpdateTime = Time.time;
+            LastActionUpdateTime = Time.time;
         }
     }
     private void OnTriggerEnter(Collider other) //상대방의 정보가 나온다.

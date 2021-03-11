@@ -19,18 +19,16 @@ public class EnemyGenerateData
     public Vector3 DisappearPoint;
 }
 
-
 public class Squadron : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [SerializeField]
+    EnemyGenerateData[] enemyGenerateDatas;
 
-    // Update is called once per frame
-    void Update()
+    public void GenerateAllData()
     {
-        
+        for (int i = 0; i < enemyGenerateDatas.Length; i++)
+        {
+            SystemManager.Instance.EnemyManager.GenerateEnemy(enemyGenerateDatas[i]);
+        }
     }
 }

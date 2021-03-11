@@ -1,0 +1,317 @@
+Using pre-set license
+Built from '2020.2/release' branch; Version is '2020.2.0f1 (3721df5a8b28) revision 3613151'; Using compiler version '192528614'; Build Type 'Release'
+OS: 'Windows 10  (10.0.0) 64bit' Language: 'ko' Physical Memory: 8075 MB
+BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1, IsPro: 0
+
+ COMMAND LINE ARGUMENTS:
+D:\Unity\2020.2.0f1\Editor\Unity.exe
+-adb2
+-batchMode
+-noUpm
+-name
+AssetImportWorker2
+-projectPath
+D:/Unity Projects/Fast_Campus
+-logFile
+Logs/AssetImportWorker2.log
+-srvPort
+53408
+Successfully changed project path to: D:/Unity Projects/Fast_Campus
+D:/Unity Projects/Fast_Campus
+Using Asset Import Pipeline V2.
+Refreshing native plugins compatible for Editor in 44.33 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Initialize engine version: 2020.2.0f1 (3721df5a8b28)
+[Subsystems] Discovering subsystems at path D:/Unity/2020.2.0f1/Editor/Data/Resources/UnitySubsystems
+[Subsystems] Discovering subsystems at path D:/Unity Projects/Fast_Campus/Assets
+GfxDevice: creating device client; threaded=0
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.0]
+    Renderer: NVIDIA GeForce GTX 950M (ID=0x139a)
+    Vendor:   
+    VRAM:     2010 MB
+    Driver:   27.21.14.6172
+Shader 'WFX/Transparent Specular': fallback shader 'Particles/Alpha Blended' not found
+Shader 'WFX/Transparent Diffuse': fallback shader 'Particles/Alpha Blended' not found
+Initialize mono
+Mono path[0] = 'D:/Unity/2020.2.0f1/Editor/Data/Managed'
+Mono path[1] = 'D:/Unity/2020.2.0f1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit'
+Mono config path = 'D:/Unity/2020.2.0f1/Editor/Data/MonoBleedingEdge/etc'
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56448
+Begin MonoManager ReloadAssembly
+Registering precompiled unity dll's ...
+Register platform support module: D:/Unity/2020.2.0f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
+Register platform support module: D:/Unity/2020.2.0f1/Editor/Data/PlaybackEngines/LinuxStandaloneSupport/UnityEditor.LinuxStandalone.Extensions.dll
+Registered in 0.001898 seconds.
+Native extension for LinuxStandalone target not found
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 47.66 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+Mono: successfully reloaded assembly
+- Completed reload, in  2.904 seconds
+Platform modules already initialized, skipping
+Registering precompiled user dll's ...
+Registered in 0.001585 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for LinuxStandalone target not found
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.30 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+Mono: successfully reloaded assembly
+- Completed reload, in  2.573 seconds
+Platform modules already initialized, skipping
+========================================================================
+Worker process is ready to serve import requests
+Shader 'WFX/Transparent Diffuse': fallback shader 'Particles/Alpha Blended' not found
+Shader 'WFX/Transparent Specular': fallback shader 'Particles/Alpha Blended' not found
+Launched and connected shader compiler UnityShaderCompiler.exe after 0.40 seconds
+Refreshing native plugins compatible for Editor in 2.71 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 1145 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 62.0 MB.
+System memory in use after: 62.1 MB.
+
+Unloading 10 unused Assets to reduce memory usage. Loaded Objects now: 1592.
+Total: 5.025800 ms (FindLiveObjects: 0.160800 ms CreateObjectMapping: 0.061500 ms MarkObjects: 4.714400 ms  DeleteObjects: 0.086800 ms)
+
+========================================================================
+Received Import Request.
+  path: Assets/Scripts/Enemy.cs
+  artifactKey: Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/Enemy.cs using Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '4d78de279f0cf60f1c98a05ada127a7e') in 0.116875 seconds
+  Import took 0.119743 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 10.446017 seconds.
+  path: Assets/Scripts/Enemy.cs
+  artifactKey: Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/Enemy.cs using Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '1eb109b91e395be4471ea257c637363f') in 0.005882 seconds
+  Import took 0.010194 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 14.132984 seconds.
+  path: Assets/Scripts/Enemy.cs
+  artifactKey: Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/Enemy.cs using Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'db6f8299644d0f083be2e96a0cbcd65b') in 0.013504 seconds
+  Import took 0.018911 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 10.261311 seconds.
+  path: Assets/Scripts/Enemy.cs
+  artifactKey: Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/Enemy.cs using Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'fd9e69660e2b825427767cc2c1b148e4') in 0.006965 seconds
+  Import took 0.016850 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 8.745714 seconds.
+  path: Assets/Scripts/Enemy.cs
+  artifactKey: Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/Enemy.cs using Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '7ccf1f7d5399bd11a3b5c3d81083e8a8') in 0.006262 seconds
+  Import took 0.010773 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 42.422778 seconds.
+  path: Assets/Scripts/Enemy.cs
+  artifactKey: Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/Enemy.cs using Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'e6b54c2af24ec205002a243666281224') in 0.015405 seconds
+  Import took 0.020049 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 25.055136 seconds.
+  path: Assets/Scripts/Enemy.cs
+  artifactKey: Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/Enemy.cs using Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '3f1fce85d444ad8a0e0e6971d9476e69') in 0.013369 seconds
+  Import took 0.026040 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 28.040671 seconds.
+  path: Assets/Scripts/Enemy.cs
+  artifactKey: Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/Enemy.cs using Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '31960fe375b698b352f843665fc0adb9') in 0.011267 seconds
+  Import took 0.015806 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 1.108845 seconds.
+  path: Assets/Scripts/Enemy.cs
+  artifactKey: Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/Enemy.cs using Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '0cf8a87cfaa5553fef8388747998d882') in 0.007969 seconds
+  Import took 0.011502 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.000106 seconds.
+  path: Assets/Scripts/Enemy.cs
+  artifactKey: Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/Enemy.cs using Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '0cf8a87cfaa5553fef8388747998d882') in 0.052451 seconds
+  Import took 0.055934 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 16.889475 seconds.
+  path: Assets/Scripts/Enemy.cs
+  artifactKey: Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/Enemy.cs using Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '4a1dc1a9fd0bcc63b23f2bce70994fd7') in 0.025287 seconds
+  Import took 0.030768 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 7.411232 seconds.
+  path: Assets/Scripts/Enemy.cs
+  artifactKey: Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/Enemy.cs using Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '2f3e94a885529dea67be80edd73a7437') in 0.009019 seconds
+  Import took 0.013594 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 57.932416 seconds.
+  path: Assets/Scripts/Enemy.cs
+  artifactKey: Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/Enemy.cs using Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '97c2d3adea73ba82a5744e5c55c8df15') in 0.037544 seconds
+  Import took 0.046842 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 88.663467 seconds.
+  path: Assets/Scripts/Enemy.cs
+  artifactKey: Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/Enemy.cs using Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'e1be08300a7cd486beee0a3a39c1134d') in 0.005916 seconds
+  Import took 0.010255 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 26.205797 seconds.
+  path: Assets/Scripts/Enemy.cs
+  artifactKey: Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/Enemy.cs using Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '25bec87245e62b1386c7d167004a2c76') in 0.008090 seconds
+  Import took 0.011901 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 17.065358 seconds.
+  path: Assets/Scripts/Enemy.cs
+  artifactKey: Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/Enemy.cs using Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '91365b2f59718465a99e9975a9e13489') in 0.006948 seconds
+  Import took 0.010051 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 4.562205 seconds.
+  path: Assets/Scripts/Enemy.cs
+  artifactKey: Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/Enemy.cs using Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'ac45f4a9cba440acafb59d9ef79ab86e') in 0.004953 seconds
+  Import took 0.009824 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 5.776265 seconds.
+  path: Assets/Scripts/Enemy.cs
+  artifactKey: Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/Enemy.cs using Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '6859050e29f2cd9e5e779d779567eb3e') in 0.010694 seconds
+  Import took 0.013931 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 36.498438 seconds.
+  path: Assets/Scripts/Enemy.cs
+  artifactKey: Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/Enemy.cs using Guid(f752168d98558e6488a0375b80434c59) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '820b5bfb3c1fe9b80d95450d960079a4') in 0.006156 seconds
+  Import took 0.011051 seconds .
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.001684 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for LinuxStandalone target not found
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.68 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+Mono: successfully reloaded assembly
+- Completed reload, in  1.522 seconds
+Platform modules already initialized, skipping
+Shader 'WFX/Transparent Diffuse': fallback shader 'Particles/Alpha Blended' not found
+Shader 'WFX/Transparent Specular': fallback shader 'Particles/Alpha Blended' not found
+Refreshing native plugins compatible for Editor in 0.33 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 1129 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 61.4 MB.
+System memory in use after: 61.5 MB.
+
+Unloading 5 unused Assets to reduce memory usage. Loaded Objects now: 1594.
+Total: 2.369100 ms (FindLiveObjects: 0.181800 ms CreateObjectMapping: 0.142200 ms MarkObjects: 1.955700 ms  DeleteObjects: 0.087200 ms)
+
+========================================================================
+Received Import Request.
+  Time since last request: 636.663749 seconds.
+  path: Assets/Scripts/PanelManager.cs
+  artifactKey: Guid(d03c1e104cc64f6439d0933feb1087d1) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/PanelManager.cs using Guid(d03c1e104cc64f6439d0933feb1087d1) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'e23089a4301d33d9b594848ad7d521ae') in 0.022973 seconds
+  Import took 0.027741 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.769623 seconds.
+  path: Assets/Scripts/UIDamage.cs
+  artifactKey: Guid(9e8634bd9f89f21418afab20a9bfa7ef) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/UIDamage.cs using Guid(9e8634bd9f89f21418afab20a9bfa7ef) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'aea233d2f61b60c93e048f52e4adf2d4') in 0.009076 seconds
+  Import took 0.011779 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.009985 seconds.
+  path: Assets/Scripts/UIDamage.cs
+  artifactKey: Guid(9e8634bd9f89f21418afab20a9bfa7ef) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/UIDamage.cs using Guid(9e8634bd9f89f21418afab20a9bfa7ef) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'aea233d2f61b60c93e048f52e4adf2d4') in 0.013869 seconds
+  Import took 0.017010 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 5.061079 seconds.
+  path: Assets/Scripts/Squadron.cs
+  artifactKey: Guid(492391504fdfbd047bc40a8b5066e69f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scripts/Squadron.cs using Guid(492391504fdfbd047bc40a8b5066e69f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '1a209341e266dd2595b376d400308cb4') in 0.017275 seconds
+  Import took 0.023142 seconds .
+
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.001127 seconds.
+Begin MonoManager ReloadAssembly
+Native extension for LinuxStandalone target not found
+Native extension for WindowsStandalone target not found
+Refreshing native plugins compatible for Editor in 0.30 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+Mono: successfully reloaded assembly
+- Completed reload, in  1.281 seconds
+Platform modules already initialized, skipping
+Shader 'WFX/Transparent Diffuse': fallback shader 'Particles/Alpha Blended' not found
+Shader 'WFX/Transparent Specular': fallback shader 'Particles/Alpha Blended' not found
+Refreshing native plugins compatible for Editor in 1.32 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 1129 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 61.7 MB.
+System memory in use after: 61.7 MB.
+
+Unloading 5 unused Assets to reduce memory usage. Loaded Objects now: 1596.
+Total: 2.897900 ms (FindLiveObjects: 0.187300 ms CreateObjectMapping: 0.078900 ms MarkObjects: 2.543800 ms  DeleteObjects: 0.085700 ms)
+
