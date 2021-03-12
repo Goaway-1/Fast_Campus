@@ -1466,7 +1466,7 @@ ___
 > **<h3>Realization</h3>**   
   - null
 ___
-## __03.10__
+## __03.11__
 > **<h3>Today Dev Story</h3>**
   - ### 대형을 유지하는 적기 생성 
   - <img src="Image/Squadron.gif" height="350" title="squadron"> 
@@ -1544,3 +1544,28 @@ ___
       </details> 
 > **<h3>Realization</h3>**   
   - null
+___
+## __03.12__
+> **<h3>Today Dev Story</h3>**
+  - csv 파일 포맷
+    - 엑셀 테이블 작성과 CSV 포맷 저장
+    - 콤마(,)로 필드 값을 구분
+    - TextAsset형태로 import 진행
+  - Marshalling
+    - 한 객체의 표현방식을 저장,전송에 적합한 데이터 형식으로 변환하는 과정
+    - 이 기술을 활요해서 CSV 테이블의 레코드 문자열을 구조체로 변환 후 저장
+    - 편하지만 빠르지 않다. runtime에는 사용 X
+    - ex)serialize 
+  - TableRecordParser 
+    - 마샬링을 이용하여 레코드를 구조체로 변환
+  - TableLoader
+    - .csv 파일을 읽어서 TableRecordParser를 통해 읽은 구조체를 상속된 클래스가 기록할 수 있도록 제작
+  - EnemyTable
+    - 로딩 및 저장소 클래스, 데이터에 접근할 수 있는 메소드 제공한다.  
+    - 엑셀에서 사용
+> **<h3>Realization</h3>**   
+  - null
+  
+  <details><summary>코드 보기</summary>
+
+  </details> 
