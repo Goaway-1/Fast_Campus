@@ -378,7 +378,6 @@ ___
   - ### __Bullet 클래스 제작__
     - 총알 관련 클래스 제작
     - 누가 발사 했는지 enum으로 다른 클래스 제작
-      
       <details>
       <summary>코드 보기</summary>
       
@@ -433,8 +432,7 @@ ___
 
   - ### __마우스를 활요한 발사__
     - <img src="Image/PlayerFire.gif" height="200" title="플레이어의 발사">
-    - InputController에서 SystemManager의 Player 접근 프로퍼티를 사용해서 Player의 Fire()함수 실행
-      
+    - InputController에서 SystemManager의 Player 접근 프로퍼티를 사용해서 Player의 Fire()함수 실행 
       <details>
       <summary>코드 보기</summary>
 
@@ -447,7 +445,6 @@ ___
         }
       }
       ```
-      
       </details> 
   - ### __Enemy도 총알 발사__
     - <img src="Image/EnemyFire.gif" height="200" title="적의 발사">
@@ -880,8 +877,7 @@ ___
       - Player, Enemy 링크 제거, 파일로 로드
       - EnemyManager와 비슷
       - BulletManager 생성, Bullet에 FilePath 추가, Player,Enemy의 발사 수정
-        <details>
-        <summary>코드 보기</summary>
+        <details><summary>코드 보기</summary>
         
         ```c#
         //BulletManager.cs
@@ -1545,7 +1541,7 @@ ___
 > **<h3>Realization</h3>**   
   - null
 ___
-## __03.12__
+## __03.13__
 > **<h3>Today Dev Story</h3>**
   - csv 파일 포맷
     - 엑셀 테이블 작성과 CSV 포맷 저장
@@ -1558,14 +1554,399 @@ ___
     - ex)serialize 
   - TableRecordParser 
     - 마샬링을 이용하여 레코드를 구조체로 변환
+    - 자르고 바이트 단위로
+    - MonoBehaviour 상속 X
+      <details><summary>코드 보기</summary>
+  
+      ```c#
+      using System;
+      using System.Collections;
+      using System.Collections.Generic;
+      using System.Runtime.InteropServices;   //marshal을 위함
+      using System.Reflection;                //marshal을 위함
+      using System.Text;
+
+      public class MarshalTableConstant   //string을 할당할때 사용할 변수
+      {
+        public const int charBufferSize = 256;
+      }
+
+      public class TableRecordParser<TMarshalStruct>  //Tamplit형
+      {
+        public TMarshalStruct ParseRecordLine(string line)  //record "한줄"을 읽어들일때 사용
+        {
+          //TMarshalStruct 크기에 맞춰서 Byte 배열 할당
+          Type type = typeof(TMarshalStruct);
+          int structSize = Marshal.SizeOf(type);      //System.Runtime.InteropServices.Marshal
+          byte[] structBytes = new byte[structSize];  //여기에 저장
+          int structBytesIndex = 0;
+
+          //line 문자열을 spliter로 자른다.
+          const string spliter = ",";
+          string[] fieldDataList = line.Split(spliter.ToCharArray());
+            
+          //각 필드에 대한 정보
+          Type dataType;
+          string splited;
+          byte[] fieldByte;
+          byte[] keyBytes;
+
+          FieldInfo[] fieldInfos = type.GetFields();      //System.Reflection.FieldInfo -> 필드에 대한 정보들이 배열로 반환
+          for (int i = 0; i < fieldInfos.Length; i++)
+          {
+            dataType = fieldInfos[i].FieldType;
+            splited = fieldDataList[i];
+
+            fieldByte = new byte[4];    //32비트 기준
+            MakeBytesByFieldType(out fieldByte, dataType, splited);
+
+            //명시적으로 보인다. fieldByte의 값을 structBytes에 누적
+            //for (int index = 0; index < fieldByte.Length; index++)
+            //{
+            //    structBytes[structBytesIndex++] = fieldByte[index];
+            //}
+
+            Buffer.BlockCopy(fieldByte, 0, structBytes, structBytesIndex, fieldByte.Length);    //한줄에
+            structBytesIndex += fieldByte.Length;
+
+            //첫번째 필드를 key값으로 사용하기 위해 백업
+            if (i == 0)
+            {
+              keyBytes = fieldByte;
+            }
+          }
+            //marshaling
+            TMarshalStruct tStruct = MakeStructFromBytes<TMarshalStruct>(structBytes);  
+            //AddData(keyBytes, tStruct);
+            return tStruct;
+        }
+
+        /// <summary>
+        /// 문자열 splite를 주어진 dataType에 맞게 fieldByte 배열에 변환해서 반환
+        /// </summary>
+        /// <param name="fieldByte">결과 값을 받을 배열</param>
+        /// <param name="dataType">splite를 변환할때 사용될 자료형</param>
+        /// <param name="splite">반환할 값이 있는 문자열</param>
+        protected void MakeBytesByFieldType(out byte[] fieldByte, Type dataType, string splite)
+        {
+          fieldByte = new byte[1];
+
+          if (typeof(int) == dataType)        //System.BitConverter
+          {
+            fieldByte = BitConverter.GetBytes(int.Parse(splite));   //바이틀 변환
+          }
+          else if (typeof(float) == dataType)
+          {
+            fieldByte = BitConverter.GetBytes(float.Parse(splite));
+          }
+          else if (typeof(bool) == dataType)
+          {
+            bool value = bool.Parse(splite);
+            int temp = value ? 1 : 0;
+
+            fieldByte = BitConverter.GetBytes((int)temp);
+          }
+          else if (typeof(string) == dataType)
+          {
+            fieldByte = new byte[MarshalTableConstant.charBufferSize];  //마샬링을 하기 위해서 고정 크기 버퍼 생성
+            byte[] byteArr = Encoding.UTF8.GetBytes(splite);            //System.Text.Encoding   
+                //변환된 byte 배열을 고정크기 버퍼에 복사
+            Buffer.BlockCopy(byteArr, 0, fieldByte, 0, byteArr.Length); //System.Buffer; -> 한공간에
+          }
+        }
+
+        /// <summary>
+        /// 마샬링을 통한 byte 배열의 T형 구조체 변환
+        /// </summary>
+        /// <typeparam name="T">마샬링에 적합하게 정의된 구조체의 타입</typeparam>
+        /// <param name="bytes">마샬링할 데이터가 저장된 배열</param>
+        /// <returns>변환된 T형 구조체</returns>
+        public static T MakeStructFromBytes<T>(byte[] bytes)
+        {
+          int size = Marshal.SizeOf(typeof(T));
+          IntPtr ptr = Marshal.AllocHGlobal(size);    //마샹 메모리 할당 (int 포인터)
+
+          Marshal.Copy(bytes, 0, ptr, size);
+
+          T tStruct = (T)Marshal.PtrToStructure(ptr, typeof(T));      //메모리로부터 T형 구조체로 변환
+          Marshal.FreeHGlobal(ptr);                                   //할당된 메모리 해제
+          return tStruct;                                             //변환된 값 반환
+        }
+      }
+      ```
+      </details>  
   - TableLoader
     - .csv 파일을 읽어서 TableRecordParser를 통해 읽은 구조체를 상속된 클래스가 기록할 수 있도록 제작
+      <details><summary>코드 보기</summary>
+  
+      ```c#
+      using System;
+      using System.Collections;
+      using System.Collections.Generic;
+      using UnityEngine;
+      using System.IO;
+
+      public class TableLoader<TMarshalStruct> : MonoBehaviour
+      {
+        [SerializeField]
+        protected string FilePath;
+
+        TableRecordParser<TMarshalStruct> tableRecordParser = new TableRecordParser<TMarshalStruct>();
+
+        public bool Load()
+        {
+          TextAsset textAsset = Resources.Load<TextAsset>(FilePath);  //textasset는 Text의 전체 String이 들어가 있다.
+          if (textAsset == null)
+          {
+            Debug.LogError("Load Faild! filePath = " + FilePath);
+            return false;
+          }
+
+          ParseTable(textAsset.text);
+
+          return true;
+        }
+
+        void ParseTable(string text)
+        {
+          StringReader reader = new StringReader(text);   //System.IO.StringReader
+
+          string line = null;
+          bool fieldRead = false;
+          while ((line = reader.ReadLine()) != null)      //파일 끝날 때까지 계속 레코드 파싱
+          {
+            if (!fieldRead) //한줄은 점프
+            {
+              fieldRead = true;
+              continue;
+            }
+
+            TMarshalStruct data = tableRecordParser.ParseRecordLine(line);
+            AddData(data);
+          }
+        }
+        protected virtual void AddData(TMarshalStruct data)
+        {
+
+        }
+      }
+      ```
+      </details>  
   - EnemyTable
     - 로딩 및 저장소 클래스, 데이터에 접근할 수 있는 메소드 제공한다.  
     - 엑셀에서 사용
+      <details><summary>코드 보기</summary>
+  
+      ```c#
+      using System.Collections;
+      using System.Collections.Generic;
+      using UnityEngine;
+      using System.Runtime.InteropServices;   //LayoutKind사용 위함
+
+      [System.Serializable]
+      [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]   //LayoutKind.Sequential = 순차적으로, CharSet.Ansi =  ASCII
+      public struct EnemyStruct   //class 아님@@ 엑셀파일의 순서와 동일
+      {
+        public int index;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MarshalTableConstant.charBufferSize)]   //string 타빙느 해줘야돼.
+        public string FilePath;
+        public int MaxHP;
+        public int Damage;
+        public int CrashDamage;
+        public int BulletSpeed;
+        public int FireRemainCount;
+        public int GamePoint;
+      }
+
+      public class EnemyTable : TableLoader<EnemyStruct>
+      {
+        Dictionary<int, EnemyStruct> tableDatas = new Dictionary<int, EnemyStruct>();
+
+        void Start()
+        {
+          Load();
+        }
+
+        protected override void AddData(EnemyStruct data)
+        {
+          base.AddData(data);
+
+          Debug.Log("data.index = " + data.index);
+          Debug.Log("data.FilePath = " + data.FilePath);
+          Debug.Log("data.MaxHP = " + data.MaxHP);
+          Debug.Log("data.Damage = " + data.Damage);
+          Debug.Log("data.CrashDamage = " + data.CrashDamage);
+          Debug.Log("data.BulletSpeed = " + data.BulletSpeed);
+          Debug.Log("data.FireRemainCount = " + data.FireRemainCount);
+          Debug.Log("data.GamePoint = " + data.GamePoint);
+
+          tableDatas.Add(data.index, data);
+        }
+
+        public EnemyStruct GetEnemy(int index)
+        {
+          if (!tableDatas.ContainsKey(index))
+          {
+            Debug.LogError("GetEnemy Error! index = " + index);
+            return default(EnemyStruct);
+          }
+
+          return tableDatas[index];
+        }
+      }
+      ```
+      </details> 
+  - SquadronTable
+    - Enemy에 대한 정보는 EnemyID로 참조
+    - 테이블 1개의 레코드는 1개의 Squadron Member를 표시
+    - 테이블 전체가 1개 Squadron, 여려개의 Squadron 필요 
+      <details><summary>코드 보기</summary>
+  
+      ```c#
+      using System.Collections;
+      using System.Collections.Generic;
+      using UnityEngine;
+      using System.Runtime.InteropServices;
+
+      [System.Serializable]
+      [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+      public struct SquadronMemberStruct
+      {
+        public int index;
+        public int EnemyID;
+        public float GeneratePointX;
+        public float GeneratePointY;
+        public float AppearPointX;
+        public float AppearPointY;
+        public float DisappearPointX;
+        public float DisappearPointY;
+      }
+
+      public class SquadronTable : TableLoader<SquadronMemberStruct>
+      {
+        List<SquadronMemberStruct> tableDatas = new List<SquadronMemberStruct>();
+
+        protected override void AddData(SquadronMemberStruct data)
+        {
+          base.AddData(data);
+          tableDatas.Add(data);
+        }
+        public SquadronMemberStruct GetSquadronMember(int index)
+        {
+          if (index < 0 || index >= tableDatas.Count)
+          {
+            Debug.LogError("GetSquadronMember Error! index = " + index);
+            return default(SquadronMemberStruct);
+          }
+          return tableDatas[index];
+        }
+      }
+      ```
+      </details>  
+  - SquadronScheduleTable
+    - Squadron이 생성되는 시간을 표현
+
+  - Enemy 생성 수정
+    - EnemyTable의 참조 변수와 프로퍼티를 SystemManager에 추가
+    - Enemy 클래스의 Reset메소드가 EnemyGenerateData 대신 SquadronMemberStruct를 사용하도록 수정 
+      ```c#
+      public void Reset(SquadronMemberStruct data)   //초기화 담당
+      {
+        EnemyStruct enemyStruct = SystemManager.Instance.EnemyTable.GetEnemy(data.EnemyID);
+
+        //Enemy 관련
+        CurrentHP = MaxHP = enemyStruct.MaxHP;
+        Damage = enemyStruct.Damage;
+        crashDamage = enemyStruct.CrashDamage;
+        BulletSpeed = enemyStruct.BulletSpeed;
+        FireRemainCount = enemyStruct.FireRemainCount;
+        GamePoint = enemyStruct.GamePoint;
+
+        //Squadron 관련
+        AppearPoint = new Vector3(data.AppearPointX, data.AppearPointY,0);
+        DisappearPoint = new Vector3(data.DisappearPointX, data.DisappearPointY, 0);
+
+        CurrentState = State.Ready;
+        LastActionUpdateTime = Time.time;
+      }
+      ```
+    - EnemyManger 클래스의 GenerateEnemy가 SquadronMemberStruct를 인자로 받도록 수정
+      ```c#
+      public bool GenerateEnemy(SquadronMemberStruct data)   //만들어줘라
+      {
+        string FilePath = SystemManager.Instance.EnemyTable.GetEnemy(data.EnemyID).FilePath;
+        GameObject go = SystemManager.Instance.EnemyCacheSystem.Archive(FilePath);  //프리펩 호출
+
+        go.transform.position = new Vector3(data.GeneratePointX, data.GeneratePointY,0);
+
+        Enemy enemy = go.GetComponent<Enemy>();
+        enemy.FilePath = FilePath;
+        enemy.Reset(data);
+
+        enemies.Add(enemy);
+        return true;
+      }
+      ``` 
+  - SquadronManager 수정
+    - squadronDatas를 SquadronData형 배열에서 SquadronTable 형 배열로 변경
+    - Start()에서 GetComponentsInChildren로 가져온 후 모두 Load호출, SquadronScheduleTable의 Load호출
+      ```c#
+      void Start()
+      {
+        squadronDatas = GetComponentsInChildren<SquadronTable>();
+        for (int i = 0; i < squadronDatas.Length; i++)
+        {
+            squadronDatas[i].Load();
+        }
+
+        squadronScheduleTable.Load();
+      }
+      ``` 
+    - SquadronSchedulTable형 변수를 SerializeField로 추가
+    - 불필요해진 Squadron 스크립트와 SquadronData 클래스 제거
 > **<h3>Realization</h3>**   
   - null
   
   <details><summary>코드 보기</summary>
+  
+  ```c#
+  using System.Collections;
+  using System.Collections.Generic;
+  using UnityEngine;
+  using System.Runtime.InteropServices;
 
+  [System.Serializable]
+  [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+  public struct SquadronMemberStruct
+  {
+    public int index;
+    public int EnemyID;
+    public float GeneratePointX;
+    public float GeneratePointY;
+    public float AppearPointX;
+    public float AppearPointY;
+    public float DisappearPointX;
+    public float DisappearPointY;
+  }
+
+  public class SquadronTable : TableLoader<SquadronMemberStruct>
+  {
+    List<SquadronMemberStruct> tableDatas = new List<SquadronMemberStruct>();
+
+    protected override void AddData(SquadronMemberStruct data)
+    {
+      base.AddData(data);
+      tableDatas.Add(data);
+    }
+    public SquadronMemberStruct GetSquadronMember(int index)
+    {
+      if (index < 0 || index >= tableDatas.Count)
+      {
+        Debug.LogError("GetSquadronMember Error! index = " + index);
+        return default(SquadronMemberStruct);
+      }
+      return tableDatas[index];
+    }
+  }
+  ```
   </details> 

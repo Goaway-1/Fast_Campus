@@ -2,13 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
-public class SquadronData
-{
-    public float SquadronGenerateTime;      //시간이 되면
-    public Squadron squadron;               //이 스쿼드론 생성
-}
-
 public class SquadronManager : MonoBehaviour
 {
     float GameStartedTime;  //시작시간
@@ -16,10 +9,23 @@ public class SquadronManager : MonoBehaviour
     int SquadronIndex;      //몇개만들껀디
 
     [SerializeField]
-    SquadronData[] squadronDatas;
+    SquadronTable[] squadronDatas;
+
+    [SerializeField]
+    SquadronScheduleTable squadronScheduleTable;
 
     bool running = false;   //게임 실행중?
 
+    void Start()
+    {
+        squadronDatas = GetComponentsInChildren<SquadronTable>();   //아래있는 테이블 다 가져옴
+        for (int i = 0; i < squadronDatas.Length; i++)
+        {
+            squadronDatas[i].Load();
+        }
+
+        squadronScheduleTable.Load();
+    }
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.K))
@@ -42,7 +48,7 @@ public class SquadronManager : MonoBehaviour
         if (!running)
             return;
 
-        if(Time.time - GameStartedTime >= squadronDatas[SquadronIndex].SquadronGenerateTime)
+        if(Time.time - GameStartedTime >= squadronScheduleTable.GetScheduleData(SquadronIndex).GenerateTime)
         {
             GenerateSquadron(squadronDatas[SquadronIndex]);
             SquadronIndex++;
@@ -54,10 +60,14 @@ public class SquadronManager : MonoBehaviour
             }
         }
     }
-    void GenerateSquadron(SquadronData data)    //스쿼드론 생성
+    void GenerateSquadron(SquadronTable table)    //스쿼드론 생성
     {
         Debug.Log("GenerateSquadron");
-        data.squadron.GenerateAllData();
+        for (int i = 0; i < table.GetCount(); i++)
+        {
+            SquadronMemberStruct squadronMember = table.GetSquadronMember(i);
+            SystemManager.Instance.EnemyManager.GenerateEnemy(squadronMember);
+        }
     }
 
     void AllSquadronGenerated() //모든 스쿼드론 생성

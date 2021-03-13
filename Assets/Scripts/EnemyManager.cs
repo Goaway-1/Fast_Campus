@@ -27,14 +27,15 @@ public class EnemyManager : MonoBehaviour
     {
     }
 
-    public bool GenerateEnemy(EnemyGenerateData data)   //만들어줘라
+    public bool GenerateEnemy(SquadronMemberStruct data)   //만들어줘라
     {
-        GameObject go = SystemManager.Instance.EnemyCacheSystem.Archive(data.FilePath);  //프리펩 호출
+        string FilePath = SystemManager.Instance.EnemyTable.GetEnemy(data.EnemyID).FilePath;
+        GameObject go = SystemManager.Instance.EnemyCacheSystem.Archive(FilePath);  //프리펩 호출
 
-        go.transform.position = data.GeneratePoint;
+        go.transform.position = new Vector3(data.GeneratePointX, data.GeneratePointY,0);
 
         Enemy enemy = go.GetComponent<Enemy>();
-        enemy.FilePath = data.FilePath;
+        enemy.FilePath = FilePath;
         enemy.Reset(data);
 
         enemies.Add(enemy);

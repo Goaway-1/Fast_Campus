@@ -10,7 +10,6 @@ public class MarshalTableConstant   //string을 할당할때 사용할 변수
     public const int charBufferSize = 256;
 }
 
-
 public class TableRecordParser<TMarshalStruct>  //Tamplit형
 {
     public TMarshalStruct ParseRecordLine(string line)  //record "한줄"을 읽어들일때 사용
@@ -18,12 +17,14 @@ public class TableRecordParser<TMarshalStruct>  //Tamplit형
         //TMarshalStruct 크기에 맞춰서 Byte 배열 할당
         Type type = typeof(TMarshalStruct);
         int structSize = Marshal.SizeOf(type);      //System.Runtime.InteropServices.Marshal
-        byte[] structBytes = new byte[structSize];
+        byte[] structBytes = new byte[structSize];  //여기에 저장
         int structBytesIndex = 0;
 
         //line 문자열을 spliter로 자른다.
         const string spliter = ",";
         string[] fieldDataList = line.Split(spliter.ToCharArray());
+        
+        //각 필드에 대한 정보
         Type dataType;
         string splited;
         byte[] fieldByte;
@@ -44,16 +45,17 @@ public class TableRecordParser<TMarshalStruct>  //Tamplit형
             //    structBytes[structBytesIndex++] = fieldByte[index];
             //}
 
-            Buffer.BlockCopy(fieldByte, 0, structBytes, structBytesIndex, fieldByte.Length);
+            Buffer.BlockCopy(fieldByte, 0, structBytes, structBytesIndex, fieldByte.Length);    //한줄에
             structBytesIndex += fieldByte.Length;
 
-            if (i==0)
+            //첫번째 필드를 key값으로 사용하기 위해 백업
+            if (i == 0)
             {
                 keyBytes = fieldByte;
             }
         }
         //marshaling
-        TMarshalStruct tStruct = MakeStructFromBytes<TMarshalStruct>(structBytes);
+        TMarshalStruct tStruct = MakeStructFromBytes<TMarshalStruct>(structBytes);  
         //AddData(keyBytes, tStruct);
         return tStruct;
     }
@@ -88,7 +90,7 @@ public class TableRecordParser<TMarshalStruct>  //Tamplit형
             fieldByte = new byte[MarshalTableConstant.charBufferSize];  //마샬링을 하기 위해서 고정 크기 버퍼 생성
             byte[] byteArr = Encoding.UTF8.GetBytes(splite);            //System.Text.Encoding   
             //변환된 byte 배열을 고정크기 버퍼에 복사
-            Buffer.BlockCopy(byteArr, 0, fieldByte, 0, byteArr.Length); //System.Buffer;
+            Buffer.BlockCopy(byteArr, 0, fieldByte, 0, byteArr.Length); //System.Buffer; -> 한공간에
         }
     }
 
@@ -101,7 +103,7 @@ public class TableRecordParser<TMarshalStruct>  //Tamplit형
     public static T MakeStructFromBytes<T>(byte[] bytes)
     {
         int size = Marshal.SizeOf(typeof(T));
-        IntPtr ptr = Marshal.AllocHGlobal(size);    //마샹 메모리 할당
+        IntPtr ptr = Marshal.AllocHGlobal(size);    //마샹 메모리 할당 (int 포인터)
 
         Marshal.Copy(bytes, 0, ptr, size);
 

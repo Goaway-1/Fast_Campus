@@ -71,6 +71,14 @@ public class SystemManager : MonoBehaviour
         get { return gamePointAccumulator; }
     }
 
+    [SerializeField]
+    EnemyTable enemyTable;
+
+    public EnemyTable EnemyTable
+    {
+        get { return enemyTable; }
+    }
+
     //Ä³½Ì°ü·Ã 3°¡Áö
     PrefabCacheSystem enemyCacheSystem = new PrefabCacheSystem();   //Àû
     PrefabCacheSystem bulletCacheSystem = new PrefabCacheSystem();  //ÃÑ¾Ë
