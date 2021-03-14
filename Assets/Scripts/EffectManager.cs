@@ -46,7 +46,7 @@ public class EffectManager : MonoBehaviour
             return null;
         }
         string filePath = effectFiles[index].filePath;
-        GameObject go = SystemManager.Instance.EffectCacheSystem.Archive(filePath);
+        GameObject go = SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().EffectCacheSystem.Archive(filePath);
         go.transform.position = position;
 
         AutoCachableEffect effect = go.GetComponent<AutoCachableEffect>();
@@ -57,7 +57,7 @@ public class EffectManager : MonoBehaviour
 
     public bool RemoveEffect(AutoCachableEffect effect)    //삭제해라
     {
-        SystemManager.Instance.EffectCacheSystem.Restore(effect.FilePath, effect.gameObject);
+        SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().EffectCacheSystem.Restore(effect.FilePath, effect.gameObject);
 
         return true;
     }
@@ -67,7 +67,7 @@ public class EffectManager : MonoBehaviour
         for (int i = 0; i < effectFiles.Length; i++)
         {
             GameObject go = Load(effectFiles[i].filePath);
-            SystemManager.Instance.EffectCacheSystem.GenerateCache(effectFiles[i].filePath, go, effectFiles[i].cacheCount);
+            SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().EffectCacheSystem.GenerateCache(effectFiles[i].filePath, go, effectFiles[i].cacheCount);
         }
     }
 }

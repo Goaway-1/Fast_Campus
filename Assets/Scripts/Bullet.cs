@@ -103,7 +103,7 @@ public class Bullet : MonoBehaviour
         NeedMove = false;
 
         //¿Ã∆Â∆Æ √ﬂ∞°
-        GameObject go = SystemManager.Instance.EffectManager.GenerateEffect(EffectManager.BulletDisapperFxIndex, transform.position);
+        GameObject go = SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().EffectManager.GenerateEffect(EffectManager.BulletDisapperFxIndex, transform.position);
         go.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
         Disapper();
     }
@@ -131,6 +131,6 @@ public class Bullet : MonoBehaviour
 
     void Disapper()
     {
-        SystemManager.Instance.BulletManager.Remove(this);
+        SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().BulletManager.Remove(this);
     }
 }

@@ -28,10 +28,6 @@ public class SquadronManager : MonoBehaviour
     }
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.K))
-        {
-            StartGame();
-        }
         CheckSquadronGeneratings();
     }
 
@@ -66,7 +62,7 @@ public class SquadronManager : MonoBehaviour
         for (int i = 0; i < table.GetCount(); i++)
         {
             SquadronMemberStruct squadronMember = table.GetSquadronMember(i);
-            SystemManager.Instance.EnemyManager.GenerateEnemy(squadronMember);
+            SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().EnemyManager.GenerateEnemy(squadronMember);
         }
     }
 

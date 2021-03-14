@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Enemy.cs" />
+    <Compile Include="Assets\Scripts\SceneController.cs" />
     <Compile Include="Assets\Scripts\EffectManager.cs" />
     <Compile Include="Assets\JMO Assets\WarFX\Demo\Assets\WFX_Demo_DeleteAfterDelay.cs" />
     <Compile Include="Assets\JMO Assets\WarFX\Scripts\WFX_BulletHoleDecal.cs" />
@@ -100,7 +101,7 @@
     <Compile Include="Assets\Scripts\InputController.cs" />
     <Compile Include="Assets\Scripts\SystemManager.cs" />
     <Compile Include="Assets\Scripts\UIDamage.cs" />
-    <Compile Include="Assets\Scripts\SceneController.cs" />
+    <Compile Include="Assets\Scripts\InGameSceneMain.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\JMO Assets\WarFX\Shaders\WFX_S Multiply Soft.shader" />

@@ -1928,6 +1928,7 @@ ___
     - <img src="Image/TitleScene.png" height="250" title="TitleScene"> 
     - 새로운 Scene 제작
     - BasicSceneMain 클래스 제작
+    - SystemManger, SceneController는 DontDestoryOnLoad이다.
       - Scene마다 사용할 부모 클래스  
         <details><summary>코드 보기</summary>
 
@@ -2014,10 +2015,9 @@ ___
       }
       ```
       </details>  
-  - Scene 이동 클래스
+  - ### Scene 이동 클래스
     - ScenController.cs -> Singleton 클래스 (SystemManager가 구현 X)
     - SceneManager.LoadSceneAsync을 사용하는 코루틴 LoadSceneAsync (비동기)
-    - using UnityEngine.SceneManagement;
       <details><summary>코드 보기</summary>
 
       ```c#
@@ -2104,7 +2104,54 @@ ___
       SceneController.Instance.LoadScene(SceneNameConstants.LoadingScene);
       ```
       </details> 
+  
+  - ### InGameSceneMain 제작
+    - SystemManager에 있는 게임 내부 정보들을 InGameSceneMain으로 이동, BaseSceneMain 참조 변수와 프로퍼티 추가
+    - 즉 SystemManger에 접근할때 사용할 Scene을 입력해 주어야한다. 
+    - 자동시작, GameState 상태 정의,
+    ```c#
+    //InGameSceneMain.cs
+    const float GameReadyIntavel = 3.0f;
 
+    public enum GameState : int
+    {
+      Ready = 0,
+      Running,
+      End
+    }
+
+    GameState currentGameState = GameState.Ready;
+    public GameState CurrentGameState
+    {
+      get{ return currentGameState; }
+    }
+    ///////
+    public T GetCurrentSceneMain<T>() where T : BaseSceneMain   //BaseSceneMain이거나 상속받은 놈만 받는다.
+    {
+      return currentSceneMain as T;   //변환만 해줌
+    }
+    ///Actor.cs
+    protected virtual void OnDead(Actor killer)
+    {
+      Debug.Log(name + "OnDead");
+      isDead = true;
+
+      SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().EffectManager.GenerateEffect(EffectManager.ActorDeadFxIndex, transform.position);
+    }
+    ```
+  - ### CurrentSceneMain 제작
+    - SystemManager의 Start에서 BaseSceneMain을 GameObject.FindObjectType로 찾아서 입력
+    - SceneController의 OnSceneLoaded에서 BaseSceneMain을 GameObject.FindObjectOfType로 찾아서 입력  
+    - 각 Scene에 배치된 씬전환에 도움이 되는 것을 SystemManger에서 초기화하는것
+      ```c#
+      //SystemManager.cs
+      private void Start()
+      {
+        BaseSceneMain baseSceneMain = GameObject.FindObjectOfType<BaseSceneMain>();
+        Debug.Log("OnSceneLoaded! baseSceneMain.name = " + baseSceneMain.name);
+        SystemManager.instance.currentSceneMain = baseSceneMain;
+      }
+      ```
 > **<h3>Realization</h3>**   
   - null
   <details><summary>코드 보기</summary>

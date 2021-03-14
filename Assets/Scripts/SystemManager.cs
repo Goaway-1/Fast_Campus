@@ -25,53 +25,6 @@ public class SystemManager : MonoBehaviour
     }
 
     [SerializeField]
-    Player player;
-
-    public Player Hero  //접근 프로퍼티
-    {
-        get { return player; }
-    }
-
-    [SerializeField]
-    EffectManager effectManager;
-
-    public EffectManager EffectManager
-    {
-        get { return effectManager; }
-    }
-
-    [SerializeField]
-    EnemyManager enemyManager;
-
-    public EnemyManager EnemyManager
-    {
-        get { return enemyManager; }
-    }
-
-    [SerializeField]
-    BulletManager bulletManager;
-
-    public BulletManager BulletManager
-    {
-        get { return bulletManager; }
-    }
-
-    [SerializeField]
-    DamageManager damageManager;
-
-    public DamageManager DamageManager
-    {
-        get { return damageManager; }
-    }
-
-    GamePointAccumulator gamePointAccumulator = new GamePointAccumulator();     //점수관리
-
-    public GamePointAccumulator GamePointAccumulator
-    {
-        get { return gamePointAccumulator; }
-    }
-
-    [SerializeField]
     EnemyTable enemyTable;
 
     public EnemyTable EnemyTable
@@ -79,32 +32,29 @@ public class SystemManager : MonoBehaviour
         get { return enemyTable; }
     }
 
-    //캐싱관련 3가지
-    PrefabCacheSystem enemyCacheSystem = new PrefabCacheSystem();   //적
-    PrefabCacheSystem bulletCacheSystem = new PrefabCacheSystem();  //총알
-    PrefabCacheSystem effectCacheSystem = new PrefabCacheSystem();  //효과
-    PrefabCacheSystem damageCacheSystem = new PrefabCacheSystem();  //효과
-
-    public PrefabCacheSystem EnemyCacheSystem
+    //
+    BaseSceneMain currentSceneMain;
+    public BaseSceneMain CurrentSceneMain
     {
-        get { return enemyCacheSystem; }
+        set
+        {
+            currentSceneMain = value;
+        }
     }
-    public PrefabCacheSystem BulletCacheSystem
-    {
-        get { return bulletCacheSystem; }
-    }
-    public PrefabCacheSystem EffectCacheSystem
-    {
-        get { return effectCacheSystem; }
-    }
-    public PrefabCacheSystem DamageCacheSystem
-    {
-        get { return damageCacheSystem; }
-    }
-    //캐싱관련 3가지 종료
 
     private void Awake()
     {
         DontDestroyOnLoad(gameObject);
+    }
+    private void Start()
+    {
+        BaseSceneMain baseSceneMain = GameObject.FindObjectOfType<BaseSceneMain>();
+        Debug.Log("OnSceneLoaded! baseSceneMain.name = " + baseSceneMain.name);
+        SystemManager.Instance.currentSceneMain = baseSceneMain;
+    }
+
+    public T GetCurrentSceneMain<T>() where T : BaseSceneMain   //BaseSceneMain이거나 상속받은 놈만 받는다.
+    {
+        return currentSceneMain as T;   //변환만 해줌
     }
 }
