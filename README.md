@@ -1537,22 +1537,25 @@ ___
         data.squadron.GenerateAllData();
       }
       ```
-      </details> 
+      </`details> 
 > **<h3>Realization</h3>**   
   - null
 ___
 ## __03.13__
 > **<h3>Today Dev Story</h3>**
-  - csv 파일 포맷
+  - ### 엑셀 파일을 사용해서 적기를 생성
+    - <img src="Image/GenerateSquadron.gif" height="250" title="GenerateSquadron">
+    - 아래에 나오는 모든 내용은 엑셀파일(.CSV)를 사용해 적기 편대화를 제작 후 호출하는 방법
+  - ### CSV 파일 포맷
     - 엑셀 테이블 작성과 CSV 포맷 저장
     - 콤마(,)로 필드 값을 구분
     - TextAsset형태로 import 진행
-  - Marshalling
+  - ### Marshalling
     - 한 객체의 표현방식을 저장,전송에 적합한 데이터 형식으로 변환하는 과정
     - 이 기술을 활요해서 CSV 테이블의 레코드 문자열을 구조체로 변환 후 저장
     - 편하지만 빠르지 않다. runtime에는 사용 X
     - ex)serialize 
-  - TableRecordParser 
+  - ### TableRecordParser 
     - 마샬링을 이용하여 레코드를 구조체로 변환
     - 자르고 바이트 단위로
     - MonoBehaviour 상속 X
@@ -1675,7 +1678,7 @@ ___
       }
       ```
       </details>  
-  - TableLoader
+  - ### TableLoader
     - .csv 파일을 읽어서 TableRecordParser를 통해 읽은 구조체를 상속된 클래스가 기록할 수 있도록 제작
       <details><summary>코드 보기</summary>
   
@@ -1732,7 +1735,8 @@ ___
       }
       ```
       </details>  
-  - EnemyTable
+  - ### EnemyTable
+    - <img src="Image/EnemyTable.png" height="150" title="EnemyTable">  
     - 로딩 및 저장소 클래스, 데이터에 접근할 수 있는 메소드 제공한다.  
     - 엑셀에서 사용
       <details><summary>코드 보기</summary>
@@ -1796,7 +1800,8 @@ ___
       }
       ```
       </details> 
-  - SquadronTable
+  - ### SquadronTable
+    - <img src="Image/SquadronEx.png" height="150" title="EnemyTable">  
     - Enemy에 대한 정보는 EnemyID로 참조
     - 테이블 1개의 레코드는 1개의 Squadron Member를 표시
     - 테이블 전체가 1개 Squadron, 여려개의 Squadron 필요 
@@ -1843,12 +1848,15 @@ ___
       }
       ```
       </details>  
-  - SquadronScheduleTable
+  - ### SquadronScheduleTable
+    - <img src="Image/SquadronScheduleTable.png" height="150" title="SquadronScheduleTable"> 
     - Squadron이 생성되는 시간을 표현
 
-  - Enemy 생성 수정
+  - ### Enemy 생성 수정
     - EnemyTable의 참조 변수와 프로퍼티를 SystemManager에 추가
     - Enemy 클래스의 Reset메소드가 EnemyGenerateData 대신 SquadronMemberStruct를 사용하도록 수정 
+      <details><summary>코드 보기</summary>
+  
       ```c#
       public void Reset(SquadronMemberStruct data)   //초기화 담당
       {
@@ -1869,8 +1877,11 @@ ___
         CurrentState = State.Ready;
         LastActionUpdateTime = Time.time;
       }
-      ```
+      ``` 
+      </details> 
     - EnemyManger 클래스의 GenerateEnemy가 SquadronMemberStruct를 인자로 받도록 수정
+      <details><summary>코드 보기</summary>
+  
       ```c#
       public bool GenerateEnemy(SquadronMemberStruct data)   //만들어줘라
       {
@@ -1887,66 +1898,215 @@ ___
         return true;
       }
       ``` 
-  - SquadronManager 수정
+      </details> 
+  - ### SquadronManager 수정
     - squadronDatas를 SquadronData형 배열에서 SquadronTable 형 배열로 변경
     - Start()에서 GetComponentsInChildren로 가져온 후 모두 Load호출, SquadronScheduleTable의 Load호출
+      <details><summary>코드 보기</summary>
+  
       ```c#
       void Start()
       {
         squadronDatas = GetComponentsInChildren<SquadronTable>();
         for (int i = 0; i < squadronDatas.Length; i++)
         {
-            squadronDatas[i].Load();
+          squadronDatas[i].Load();
         }
 
         squadronScheduleTable.Load();
-      }
+        }
       ``` 
+      </details> 
     - SquadronSchedulTable형 변수를 SerializeField로 추가
     - 불필요해진 Squadron 스크립트와 SquadronData 클래스 제거
 > **<h3>Realization</h3>**   
   - null
-  
-  <details><summary>코드 보기</summary>
-  
-  ```c#
-  using System.Collections;
-  using System.Collections.Generic;
-  using UnityEngine;
-  using System.Runtime.InteropServices;
+___
+## __03.14__
+> **<h3>Today Dev Story</h3>**
+  - ### 타이틀 화면 제작
+    - <img src="Image/TitleScene.png" height="250" title="TitleScene"> 
+    - 새로운 Scene 제작
+    - BasicSceneMain 클래스 제작
+      - Scene마다 사용할 부모 클래스  
+        <details><summary>코드 보기</summary>
 
-  [System.Serializable]
-  [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-  public struct SquadronMemberStruct
-  {
-    public int index;
-    public int EnemyID;
-    public float GeneratePointX;
-    public float GeneratePointY;
-    public float AppearPointX;
-    public float AppearPointY;
-    public float DisappearPointX;
-    public float DisappearPointY;
-  }
+        ```c#
+        public class BaseSceneMain : MonoBehaviour
+        {
+          private void Awake()
+          {
+            OnAwake();
+          }
+          private void Start()
+          {
+            OnStart();
+          }
+          private void Update()
+          {
+            UpdateScene();
+          }
+          private void OnDestroy()
+          {
+            Terminate();
+          }
+          protected virtual void OnAwake()
+          { }
+          protected virtual void OnStart()
+          { }
 
-  public class SquadronTable : TableLoader<SquadronMemberStruct>
-  {
-    List<SquadronMemberStruct> tableDatas = new List<SquadronMemberStruct>();
+          //외부에서 초기화 호출
+          public virtual void Initialize()
+          { }
 
-    protected override void AddData(SquadronMemberStruct data)
-    {
-      base.AddData(data);
-      tableDatas.Add(data);
-    }
-    public SquadronMemberStruct GetSquadronMember(int index)
-    {
-      if (index < 0 || index >= tableDatas.Count)
+          protected virtual void UpdateScene()
+          { }
+          protected virtual void Terminate()
+          { }
+        }
+        ```
+        </details>  
+    - TitleSceneMain 클래스 제작
+      - TitleScene과 연관
+        <details><summary>코드 보기</summary>
+
+        ```c#
+        public void OnStartButton()
+        {
+          Debug.Log("OnStartButton");
+        }
+        ```
+        </details>  
+  - ### 로딩 화면 UI만들기  
+    - <img src="Image/LoadingScene.gif" height="250" title="LoadingScene">  
+      <details><summary>코드 보기</summary>
+
+      ```c#
+      public class LoadingSceneMain : BaseSceneMain
       {
-        Debug.LogError("GetSquadronMember Error! index = " + index);
-        return default(SquadronMemberStruct);
+        const float TextUpdateIntaval = 0.15f;
+        const string LoadingTextValue = "Loading...";
+
+        [SerializeField]
+        Text LoadingText;
+
+        int TextIndex = 0;
+        float LastUpdateTime;
+
+        protected override void UpdateScene()
+        {
+          base.UpdateScene();
+
+          float currentTime = Time.time;
+          if (currentTime - LastUpdateTime > TextUpdateIntaval)
+          {
+            LoadingText.text = LoadingTextValue.Substring(0, TextIndex + 1);
+
+            TextIndex++;
+            if (TextIndex >= LoadingTextValue.Length)
+            {
+              TextIndex = 0;
+            }
+
+            LastUpdateTime = currentTime;
+          }
+        }
       }
-      return tableDatas[index];
-    }
-  }
-  ```
+      ```
+      </details>  
+  - Scene 이동 클래스
+    - ScenController.cs -> Singleton 클래스 (SystemManager가 구현 X)
+    - SceneManager.LoadSceneAsync을 사용하는 코루틴 LoadSceneAsync (비동기)
+    - using UnityEngine.SceneManagement;
+      <details><summary>코드 보기</summary>
+
+      ```c#
+      using UnityEngine.SceneManagement;  //SceneManager 사용을 위함
+
+      public class SceneNameConstants
+      {
+        public static string TitleScene = "TitleScene";
+        public static string LoadingScene = "LoadingScene";
+        public static string InGame = "InGaem";
+      }
+      public class SceneController : MonoBehaviour
+      {
+        private static SceneController instance = null;
+
+        public static SceneController Instance
+        {
+          get
+          {
+            if (instance == null)
+            {
+              instance = FindObjectOfType<SceneController>();
+              if (instance == null)
+              {
+                GameObject container = new GameObject("SceneController");
+                instance = container.AddComponent<SceneController>();
+              }
+            }
+            return instance;
+          }
+        }
+
+        private void Awake()
+        {
+          DontDestroyOnLoad(this);
+        }
+
+        private void Start()
+        {
+          SceneManager.activeSceneChanged += OnActiveSceneChanged;    //액티브된 씬이 바뀌였을때
+          SceneManager.sceneLoaded += OnSceneLoaded;    //씬이 로드되었을때
+          SceneManager.sceneUnloaded += OnSceneUnLoaded;   //씬이 언로드 되었을때
+        }
+
+        //이전 Scene을 Unload하고 로딩 (1가지 씬만 존재)
+        public void LoadScene(string sceneName)
+        {
+          StartCoroutine(LoadSceneAsync(sceneName, LoadSceneMode.Single));
+        }
+
+        //이전 Scene을 Unload 없이 로딩 (2가지 씬 존재)
+        public void LoadSceneAdditive(string sceneName)
+        {
+          StartCoroutine(LoadSceneAsync(sceneName, LoadSceneMode.Additive));
+        }
+
+        IEnumerator LoadSceneAsync(string sceneName, LoadSceneMode loadSceneMode)   //로드씬 (비동기방식)
+        {
+          AsyncOperation asyncOperation = SceneManager.LoadSceneAsync(sceneName, loadSceneMode);
+
+          while (!asyncOperation.isDone)  //끝나면 종료
+            yield return null;
+
+          Debug.Log("LoadSceneAsyne is Complete!");
+        }
+
+        public void OnActiveSceneChanged(Scene scene0, Scene scene1)
+        {
+          Debug.Log("OnActiveSceneChanged is Called! Scene0 = " + scene0.name + ", Scene1 = " + scene1.name);
+        }
+
+        public void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
+        {
+          Debug.Log("OnSceneLoaded is Called! Scene = " + scene.name + ", loadSceneMode = " + loadSceneMode.ToString());
+        }
+        public void OnSceneUnLoaded(Scene scene)
+        {
+          Debug.Log("OnSceneUnLoaded is Called! Scene = " + scene.name);
+        }
+      }
+      ```
+      ```c#
+      //TitleScene.cs
+      SceneController.Instance.LoadScene(SceneNameConstants.LoadingScene);
+      ```
+      </details> 
+
+> **<h3>Realization</h3>**   
+  - null
+  <details><summary>코드 보기</summary>
+
   </details> 

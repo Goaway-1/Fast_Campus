@@ -19,6 +19,7 @@ public class SquadronScheduleTable : TableLoader<SquadronScheduleDataStruct>
     protected override void AddData(SquadronScheduleDataStruct data)
     {
         base.AddData(data);
+        tableDatas.Add(data);
     }
     public SquadronScheduleDataStruct GetScheduleData(int index)
     {
