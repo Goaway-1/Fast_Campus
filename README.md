@@ -2154,6 +2154,141 @@ ___
       ```
 > **<h3>Realization</h3>**   
   - null
+___
+## __03.14__
+> **<h3>Today Dev Story</h3>**
+  - ### <span style="color:yellow;">__MultiPlayer 만들기__</span>
+    - ### HLAPI 패키지 설치
+      - <img src="Image/HLAPI.png" height="200" title="HLAPI">  
+      - NetworkManger(HLAPI에서 제공)를 상속한 FWNetworkManger클래스 추가
+      - 서버와 클라이언트 사이드 이벤트를 구별하기 위해 #region 사용
+      - Offline Scene과 Online Scene에 LoadingScene과 InGame 씬 연결
+      - <img src="Image/FWNetWorkManager.png" height="280" title="HLAPI"> 
+        <details><summary>코드 보기</summary>
+
+        ```c#
+        using UnityEngine.Networking;   //HLAPI가 설치 되어있어야 지원한다.
+
+        public class FWNetworkManager : NetworkManager
+        {
+          #region SERVER SID EVENT
+          public override void OnServerConnect(NetworkConnection conn)    //서버연결시
+          {
+              Debug.Log("OnSeverConnect call : " + conn.address);
+              base.OnServerConnect(conn);
+          }
+
+          public override void OnServerSceneChanged(string sceneName)     //서버에서 씬이 바뀌였을때
+          {
+            Debug.Log("OnServerSceneChanged : " + sceneName);
+            base.OnServerSceneChanged(sceneName);
+          }
+          public override void OnServerReady(NetworkConnection conn)  //서버가 준비되었을때
+          {
+            Debug.Log("OnServerReady : " + conn.address);
+            base.OnServerReady(conn);
+          }
+          public override void OnServerError(NetworkConnection conn, int errorCode)   //서버가 오류를 발생했을때
+          {
+            Debug.Log("OnServerError : ErrorCode = " + errorCode);
+            base.OnServerError(conn, errorCode);
+          }
+          public override void OnServerDisconnect(NetworkConnection conn)
+          {
+            Debug.Log("OnServerDisconnect : " + conn.address);
+            base.OnServerDisconnect(conn);
+          }
+          #endregion
+
+          #region CLIENT SIDE EVENT
+          public override void OnStartClient(NetworkClient client)
+          {
+            Debug.Log("OnStartClient : " + client.serverIp);
+            base.OnStartClient(client);
+          }
+          public override void OnClientConnect(NetworkConnection conn)
+          {
+            Debug.Log("OnClientConnect : connectionID " + conn.connectionId + ", hostID = " + conn.hostId);
+            base.OnClientConnect(conn);
+          }
+          public override void OnClientSceneChanged(NetworkConnection conn)
+          {
+            Debug.Log("OnClientSceneChanged : " + conn.hostId);
+            base.OnClientSceneChanged(conn);
+          }
+          public override void OnClientError(NetworkConnection conn, int errorCode)
+          {
+            Debug.Log("OnClientError : " + errorCode);
+            base.OnClientError(conn, errorCode);
+          }
+          public override void OnClientDisconnect(NetworkConnection conn)
+          {
+            Debug.Log("OnClientDisconect : " + conn.hostId);
+            base.OnClientDisconnect(conn);
+          }
+          public override void OnClientNotReady(NetworkConnection conn)
+          {
+            Debug.Log("OnClientDisconect : " + conn.hostId);
+            base.OnClientNotReady(conn);
+          }
+          public override void OnDropConnection(bool success, string extendedInfo)    //강제로 종료 되었을때
+          {
+            Debug.Log("OnDropConnection : " + extendedInfo);
+            base.OnDropConnection(success, extendedInfo);
+          }
+          #endregion
+        }
+        ```
+        </details>  
+    - ### LoadingSceneMain 수정
+      - LoadScene 대신 FWNetWorkManager의 StartHost를 호출
+      - Host가 서버에 접속하는 방법이다.
+        <details><summary>코드 보기</summary>
+
+        ```c#
+        void GotoNextScene()
+        {
+          //SceneController.Instance.LoadScene(SceneNameConstants.InGame);
+          FWNetworkManager.singleton.StartHost();
+          NextSceneCall = true;
+        }
+        ```
+        </details> 
+    - ### Player 수정
+      - Actor가 NetWorkBehaviour를 상속하도록 수정, 그래야 네트워크 조작가능
+      - MoveVector 변수에 SyncVar 어트리뷰트 추가
+      - SerializeField 어트리뷰트로 NetWorkIdentity 변수 추가 (이게 뭔데)
+      - CmdMove 추가하고  UpdateMove에서 사용
+        <details><summary>코드 보기</summary>
+
+        ```c#
+        void UpdateMove()
+        {
+          if (MoveVector.sqrMagnitude == 0)   //백터의 값이 모두 0인지 확인
+            return;
+
+          MoveVector = AdjustMoveVector(MoveVector);
+
+          //transform.position += MoveVector;
+          CmdMove(MoveVector);
+        }
+
+        [Command]
+        public void CmdMove(Vector3 moveVector)
+        {
+          this.MoveVector = moveVector;
+          transform.position += moveVector;
+          base.SetDirtyBit(1);
+        }
+        ```
+        </details>  
+    - ### InGame에서 Player 프리펩 제거
+      - Player의 MainBGQuadTransform 변수를 InGameScene으로 이동 및 수정
+      - InGameSceneMain의 Hero 프로퍼티를 외부 입력이 가능하도록 수정 -> set추가
+      - Player의 Initialize에서 isLocalPlayer 체크 후 InGameSceneMain의 Hero에 입력
+      - InputController의 Update에서 InGameSceneMain의 상태가 Running이 아니면 Return 처리 
+> **<h3>Realization</h3>**
+  - null
   <details><summary>코드 보기</summary>
 
   </details> 

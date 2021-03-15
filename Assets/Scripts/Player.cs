@@ -1,18 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class Player : Actor
 {  
     //이동과 관련
+    [SerializeField]
+    [SyncVar]           //이게 뭔데
     Vector3 MoveVector = Vector3.zero;
-    float Speed = 5;
+
+    [SerializeField]
+    NetworkIdentity networkIdentity = null;
+
+    [SerializeField]
+    float Speed;
 
     [SerializeField]
     BoxCollider boxCollider;
-
-    [SerializeField]
-    Transform MainBGQuadTransform;
 
     //총알과 관련
     [SerializeField]
@@ -30,6 +35,11 @@ public class Player : Actor
         base.Initialize();
         PlayerStatePanel playerStatePanel = PanelManager.GetPanel(typeof(PlayerStatePanel)) as PlayerStatePanel;
         playerStatePanel.SetHP(CurrentHP, MaxHP);   //초기화
+
+        if (isLocalPlayer)
+        {
+            SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().Hero = this;
+        }
     }
 
     protected override void UpdateActor()   //Actor의 Update와 연관
@@ -44,7 +54,16 @@ public class Player : Actor
 
         MoveVector = AdjustMoveVector(MoveVector);
 
-        transform.position += MoveVector;
+        //transform.position += MoveVector;
+        CmdMove(MoveVector);
+    }
+
+    [Command]   //Cmd형식은 Command로 동작 -> 클라이언트가 서버한테 보내는
+    public void CmdMove(Vector3 moveVector)
+    {
+        this.MoveVector = moveVector;
+        transform.position += moveVector;
+        base.SetDirtyBit(1);        //MoveVector가 SyncVar인데 바뀌였다. (서버에 통보)
     }
 
     public void ProcessInput(Vector3 moveDirection) //InputController에서 사용 (입력시) 
@@ -54,22 +73,23 @@ public class Player : Actor
 
     Vector3 AdjustMoveVector(Vector3 moveVector)    //화면 밖으로 나가지 못하게 (transform 사용)
     {
+        Transform mainBGQuadTransform = SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().MainBGQuadTransform;
         Vector3 result = Vector3.zero;
         result = boxCollider.transform.position + moveVector;   //곧 이동할 나의 위치
 
-        if(result.x - boxCollider.size.x * 0.5f < -MainBGQuadTransform.localScale.x * 0.5f)
+        if(result.x - boxCollider.size.x * 0.5f < -mainBGQuadTransform.localScale.x * 0.5f)
         {
             moveVector.x = 0;
         }
-        if (result.x + boxCollider.size.x * 0.5f > MainBGQuadTransform.localScale.x * 0.5f)
+        if (result.x + boxCollider.size.x * 0.5f > mainBGQuadTransform.localScale.x * 0.5f)
         {
             moveVector.x = 0;
         }
-        if (result.y - boxCollider.size.y * 0.5f < -MainBGQuadTransform.localScale.y * 0.5f)
+        if (result.y - boxCollider.size.y * 0.5f < -mainBGQuadTransform.localScale.y * 0.5f)
         {
             moveVector.y = 0;
         }
-        if (result.y + boxCollider.size.y * 0.5f > MainBGQuadTransform.localScale.y * 0.5f)
+        if (result.y + boxCollider.size.y * 0.5f > mainBGQuadTransform.localScale.y * 0.5f)
         {
             moveVector.y = 0;
         }

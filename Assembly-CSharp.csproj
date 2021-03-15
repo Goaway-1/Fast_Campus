@@ -70,6 +70,7 @@
     <Compile Include="Assets\Scripts\EnemyTable.cs" />
     <Compile Include="Assets\Scripts\BaseSceneMain.cs" />
     <Compile Include="Assets\Scripts\TableLoader.cs" />
+    <Compile Include="Assets\Scripts\InGameSceneMain.cs" />
     <Compile Include="Assets\Scripts\LoadingSceneMain.cs" />
     <Compile Include="Assets\JMO Assets\WarFX\Demo\Assets\CFX_Demo_Translate.cs" />
     <Compile Include="Assets\Scripts\AutoCachableEffect.cs" />
@@ -101,7 +102,7 @@
     <Compile Include="Assets\Scripts\InputController.cs" />
     <Compile Include="Assets\Scripts\SystemManager.cs" />
     <Compile Include="Assets\Scripts\UIDamage.cs" />
-    <Compile Include="Assets\Scripts\InGameSceneMain.cs" />
+    <Compile Include="Assets\Scripts\FWNetworkManager.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\JMO Assets\WarFX\Shaders\WFX_S Multiply Soft.shader" />
@@ -715,6 +716,15 @@
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="com.unity.multiplayer-hlapi.Runtime">
+      <HintPath>Library\ScriptAssemblies\com.unity.multiplayer-hlapi.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="com.unity.multiplayer-hlapi.Editor">
+      <HintPath>Library\ScriptAssemblies\com.unity.multiplayer-hlapi.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="com.unity.multiplayer-weaver.Editor">
+      <HintPath>Library\ScriptAssemblies\com.unity.multiplayer-weaver.Editor.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
