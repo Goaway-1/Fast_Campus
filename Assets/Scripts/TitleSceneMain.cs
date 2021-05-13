@@ -4,10 +4,13 @@ using UnityEngine;
 
 public class TitleSceneMain : BaseSceneMain
 {
-    public void OnStartButton()
+    public void OnStartButton() //NetworkConfigPanel을 화면에 출력
     {
-        Debug.Log("OnStartButton");
+        PanelManager.GetPanel(typeof(NetworkConfigPanel)).Show();   
+    }
 
+    public void GotoNextScene()
+    {
         SceneController.Instance.LoadScene(SceneNameConstants.LoadingScene);
     }
 }

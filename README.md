@@ -2289,6 +2289,456 @@ ___
       - InputController의 Update에서 InGameSceneMain의 상태가 Running이 아니면 Return 처리 
 > **<h3>Realization</h3>**
   - null
+___
+## __05.12__
+> **<h3>Today Dev Story</h3>**
+  - ### TitleScene에 네트워크 선택 UI추가 (원격 or 호스트)
+    - <img src="Image/Lan_Image.png" height="280" title="Lan Image">
+    - ## NetworkConfigPanel
+      - Lan Host버튼, IP Address 인풋 필드, Port 인풋 필드, Lan Client 버튼
+    - ## SystemManager에 접속 정보 추가
+      - NetworkConnectionInfo 데이터 클래스 생성
+      - Host 여부에 따른 접속 정보
+      - string 형 IP Address
+      - int 형 port 정보
+      - SystemManager에 NetorkConnectionInfo형 변수 추가 
+        <details><summary>코드 보기</summary>
+
+          ```c#
+          [System.Serializable]
+          public class NetworkConnectionInfo
+          {
+            /// <summary>
+            /// 호스트로 실행 여부
+            /// </summary>
+            public bool Host;
+
+            /// <summary>
+            /// 클라이언트로 실행시 접속할 호스트의 IP주소
+            /// </summary>
+            public string IPAddress;
+
+            ///<summary>
+            /// 클라이언트로 실행시 접속할 호스트의 Port
+            /// </summary>
+            public int port;
+          }
+          ```
+        </details> 
+    - ## NetworkConfigPanel 클래스 만들기
+      - BasePanel 상속, Host버튼, Client 버튼 이벤트를 위한 메서드
+      - IP Address 입력, Port입력을 위한 InputField형 변수
+        <details><summary>코드 보기</summary>
+
+          ```c#
+          public class NetworkConfigPanel : BasePanel
+          {
+            const string DefaultIPAddress = "localhost";
+            const string DefaultPort = "7777";
+
+            [SerializeField]
+            InputField IPAddressInputField;
+
+            [SerializeField]
+            InputField PortInputField;
+
+            public override void InitializePanel()
+            {
+              base.InitializePanel();
+
+              //IP와 Port번호를 기본값으로 설정
+              IPAddressInputField.text = DefaultIPAddress;
+              PortInputField.text = DefaultPort;
+              Close(); //일단 꺼놓기
+            }
+
+            public void OnHostButton()  //호스트 접속
+            {
+              SystemManager.Instance.ConnectionInfo.Host = true;
+              TitleSceneMain sceneMain = SystemManager.Instance.GetCurrentSceneMain<TitleSceneMain>();
+              sceneMain.GotoNextScene(); //다음 씬으로 넘어가겠다.
+            }
+
+            public void OnClientButton()    //클라이언트로 접속
+            {
+              SystemManager.Instance.ConnectionInfo.Host = false;
+              TitleSceneMain sceneMain = SystemManager.Instance.GetCurrentSceneMain<TitleSceneMain>();
+
+              //IP입력 값
+              if (!string.IsNullOrEmpty(IPAddressInputField.text) || IPAddressInputField.text != DefaultIPAddress)
+                SystemManager.Instance.ConnectionInfo.IPAddress = IPAddressInputField.text;
+
+              //Port번호 입력 값
+              if(!string.IsNullOrEmpty(PortInputField.text) || PortInputField.text != DefaultPort)
+              {
+                int port = 0;
+                if (int.TryParse(PortInputField.text, out port))    //int 형으로 변환
+                  SystemManager.Instance.ConnectionInfo.port = port;
+                else
+                {
+                  Debug.LogError("OnClientButton error port = " + PortInputField.text);
+                  return;
+                }
+              }
+              sceneMain.GotoNextScene();
+            }
+          }
+          ```
+        </details> 
+
+    - ## TitleSceneMain 수정
+      - OnStartButton에서 Scene을 이동하는 것이 아닌 NetworkConfigPanel이 보일 수 있도록 수정
+      - GotoNextScene 메소드를 추가해서 Scene을 이동
+        <details><summary>코드 보기</summary>
+
+          ```c#
+          public void OnStartButton() //NetworkConfigPanel을 화면에 출력
+          {
+            PanelManager.GetPanel(typeof(NetworkConfigPanel)).Show();   
+          }
+
+          public void GotoNextScene() //씬의 이동
+          {
+            SceneController.Instance.LoadScene(SceneNameConstants.LoadingScene);
+          }
+          ```
+        </details> 
+    
+    - ## LoadingScene에서 접속 정보 적용
+      - GotoNextScene 메소드에서 SystemManager의 ConnectionInfo에 따라 동작
+      - 다른 PC에서 접속할 때 IP를 입력해서 테스트 (cmd -> ipconfig로 확인)
+        <details><summary>코드 보기</summary>
+
+          ```c#
+          void GotoNextScene()
+          {
+            NetworkConnectionInfo info = SystemManager.Instance.ConnectionInfo;
+            if (info.Host)
+              {
+                Debug.Log("FW Start with host!");
+                FWNetworkManager.singleton.StartHost();
+              }
+              else
+              {
+                Debug.Log("FW Start with client!");
+
+              if (!string.IsNullOrEmpty(info.IPAddress))  
+                FWNetworkManager.singleton.networkAddress = info.IPAddress;
+
+              if (info.port != FWNetworkManager.singleton.networkPort)    //int형
+                FWNetworkManager.singleton.networkPort = info.port;
+
+              FWNetworkManager.singleton.StartClient();   //호스트에 접속하도록 한다.
+            }
+
+            NextSceneCall = true;
+          }
+          ```
+        </details> 
+
+    - ## Player 위치 동기화를 위한 수정
+      - 네트워크의 사용 후 Player의 위치가 정가운데로 오게되었음 이를 수정 
+      - InGameScene에 배치된 InputController 삭제, 클래스의 상속 또한 제거 (Monobehaivour)
+      - Player가 InputController를 소유하는 형태로 변경
+      - Player에 UpdateInput 메서드 추가 후 UpdateActor에서 호출 
+        <details><summary>코드 보기</summary>
+
+          ```c#
+          //
+          protected override void UpdateActor()   //Actor의 Update와 연관
+          {
+            UpdateInput();
+            UpdateMove();
+          }
+
+          [ClientCallback]    //내 클라이언트에서만 실행이된다.
+          public void UpdateInput()
+          {
+            inputController.UpdateInput();
+          }
+
+          void UpdateMove()
+          {
+            if (MoveVector.sqrMagnitude == 0)   //백터의 값이 모두 0인지 확인
+              return;
+
+            //정상적으로 NetworkBehaviour 인스턴스의 Update로 호출되어 실행시
+            //cmdMove()
+
+            // MonoBehaviour 인스턴스의 Update로 호출되어 실행되고 있을때의 꼼수
+            // 이경우 클라이언트로 접속하면 Command로 보내지지만 자기자신은 CmdMove를 실행하지 못함
+            if (isServer)
+            {
+              RpcMove(MoveVector);    //Host인 경우 RpcMove로 보내고
+            }
+            else
+            {
+              CmdMove(MoveVector);    //Client 플레이어인 경우 Cmd로 호스트를 보낸후 자기을 self 동작
+              if (isLocalPlayer)
+                transform.position += AdjustMoveVector(MoveVector);
+            }
+          }
+
+          [Command]   //Cmd형식은 Command로 동작 -> 클라이언트가 서버한테 보내는
+          public void CmdMove(Vector3 moveVector)
+          {
+            this.MoveVector = moveVector;
+            transform.position += moveVector;
+            base.SetDirtyBit(1);            //MoveVector가 SyncVar인데 바뀌였다. (서버에 통보)
+            this.MoveVector = Vector3.zero; //타 플레이어가 보낸경우 Update를 통해 초기화 되지 않으므로 사용후 바로 초기화
+          }
+
+          [ClientRpc]     
+          public void RpcMove(Vector3 moveVector)
+          {
+            this.MoveVector = moveVector;
+            transform.position += moveVector;
+            base.SetDirtyBit(1);        //MoveVector가 SyncVar인데 바뀌였다. (서버에 통보)
+          }
+          ```
+        </details>
+
+> **<h3>Realization</h3>**
+  - 에디터로는 방문자로 접속, 프로그램으로는 Host로 접속, 2개의 플레이어 등장한다.
+___
+## __05.13__
+> **<h3>Today Dev Story</h3>**
+  - ### 게임 시작 수정
+    - <img src="Image/ReMain.png" height="280" title="SeverConnect">
+    - Host는 Client가 접속할때까지 대기
+    - Client 접속 후 일정 시간이 지나면 게임 시작
+    - InGameSceneMain의 OnStart를 외부에서 사용가능한 메소드로 수정
+      - GameState를 삭제 및 다른 메소드들을 이동
+      <details><summary>코드 보기</summary>
+
+        ```c#
+        [SerializeField]
+        InGameNetworkTransfer inGameNetworkTransfer;
+
+        InGameNetworkTransfer NetworkTransfer
+        {
+          get { return inGameNetworkTransfer; }
+        }
+
+        public void GameStart()
+        {
+          NetworkTransfer.RpcGameStart();
+        }
+        ```
+      </details>  
+    - FWNetowrkManager에서 Player 카운트로 게임을 시작하도록 수정  
+      <details><summary>코드 보기</summary>
+
+        ```c#
+        public override void OnServerReady(NetworkConnection conn)  //서버가 준비되었을때
+        {
+          Debug.Log("OnServerReady : " + conn.address + "," + conn.connectionId);
+          base.OnServerReady(conn);
+
+          PlayerCount++;
+
+          if(PlayerCount >= WaitingPlayerCount)
+          {
+            InGameSceneMain inGameSceneMain = SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>();
+            inGameSceneMain.GameStart();
+          }
+        }
+        ```
+      </details>  
+    - InGameNetworkTransfer 클래스를 만들어 게임 시작과 상태에 관련된 기능을 이동 
+  
+  - ### 동기화를 위한 준비 작업 
+    - 캐시 생성시 계층 정리 (각각의 Manager아래로), Enemt, Bullet, EnemyBullet, Effcet, Damge => Generate뒤에 this.transform추가
+
+  - ### Player 위치 초기화
+    - <img src="Image/SeverConnect.gif" height="280" title="SeverConnect">
+    - InGame에서 Empty GameObject를 2개 만들고 각각 PlayerStart1, PlayerStart2로 이름 변경
+      <details><summary>코드 보기</summary>
+
+        ```c#
+        //InGameSceneMain.cs
+        [SerializeField]
+        Transform playerStartTransform1;
+        public Transform PlayerStartTransform1
+        {
+          get { return playerStartTransform1; }
+        }
+        ```
+      </details>  
+    - InGameSceneMain에 Transform 변수를 2개 만들고 각각을 링크
+    - Player 클래스의 Initialize에서 위치를 초기화 시킨 후 서버에 알림
+      <details><summary>코드 보기</summary>
+
+        ```c#
+        void SetPosition(Vector3 position)
+        {
+          //정상적으로 NetworkBehaviour 인스턴스의 Update로 호출되어 실행되고 있을때
+          //CmdSetPosition 사용
+
+          //MonoBehaviour 인스턴스의 Update로 호출되어 실행되고 있을때의 꼼수
+          if (isServer)   //Host의 경우
+          {
+            RpcSetPosition(position);   
+          }
+          else            //Client인 경우
+          {
+            CmdSetPosition(position);
+            if (isLocalPlayer)
+              transform.position = position;
+          }
+        }
+          
+        [Command]
+        public void CmdSetPosition(Vector3 position)
+        {
+          this.transform.position = position;
+          base.SetDirtyBit(1);    //동기화?
+        }
+
+        [ClientRpc]
+        public void RpcSetPosition(Vector3 position)
+        {
+          this.transform.position = position;
+          base.SetDirtyBit(1);
+        }
+        ```
+      </details> 
+    - 동기화하여 충돌을 없게 하기 위해서 Enemy 또한 동일
+
+  - ### Enemy 생성 동기화
+    - Player의 SetPosition 관련 메소드를 Actor클래스로 이동
+    - Actor 클래스에 RpcSetActive 메소드 추가
+      <details><summary>코드 보기</summary>
+
+        ```c#
+        void SetPosition(Vector3 position)
+        {
+          //정상적으로 NetworkBehaviour 인스턴스의 Update로 호출되어 실행되고 있을때
+          //CmdSetPosition 사용
+
+          //MonoBehaviour 인스턴스의 Update로 호출되어 실행되고 있을때의 꼼수
+          if (isServer)   //Host의 경우
+          {
+            RpcSetPosition(position);   
+          }
+          else            //Client인 경우
+          {
+            CmdSetPosition(position);
+            if (isLocalPlayer)
+              transform.position = position;
+          }
+        }
+          
+        [Command]
+        public void CmdSetPosition(Vector3 position)
+        {
+          this.transform.position = position;
+          base.SetDirtyBit(1);    //동기화?
+        }
+
+        [ClientRpc]
+        public void RpcSetPosition(Vector3 position)
+        {
+          this.transform.position = position;
+          base.SetDirtyBit(1);
+        }
+
+        [ClientRpc]
+        public void RpcSetActive(bool value)    //호스트에서만 호출 가능
+        {
+          this.gameObject.SetActive(value);
+          base.SetDirtyBit(1);
+        }
+        ```
+      </details>  
+    - Enemy 프리펩에 NetworkIdentity 어태치
+      - 무조건 호스트에서 생성할 수 있도록 조치한다. 
+        <details><summary>코드 보기</summary>
+
+          ```c#
+          //EnemyManager.cs의 모든 메소드에 추가 하여 호스트가 아니면 실행하지 못하도록 한다.
+          if (!((FWNetworkManager)FWNetworkManager.singleton).isServer)
+            return true;
+          ```
+        </details> 
+    - FWNetworkManager에 OnStartServer 메소드 추가
+      - Host 접근시 활성화된다. 
+        <details><summary>코드 보기</summary>
+
+          ```c#
+          //FWNetworkManager.cs
+          public override void OnStartServer()    //호스트로 접속할때만 들어옴
+          {
+            Debug.Log("OnStartSever");
+            base.OnStartServer();
+            isServer = true;
+          }
+          ```
+        </details>  
+    - InGameNetworkTransfer에 RpcGameStart메소드에 게임 시작 추가
+      <details><summary>코드 보기</summary>
+
+        ```c#
+        //InGameNetworkTransfer.cs
+        SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().EnemyManager.Prepare();
+        ```
+      </details>      
+    - LoadingScene의 NetworkManager의 Spawnable Prefabs에 Enemy프리펩 등록
+    - PrefabCacheSystem의 GenerateCache에서 Instantiate이후에 NetworkServer.Spwan()호출
+      <details><summary>코드 보기</summary>
+
+        ```c#
+        //PrefabCacheSystem.cs
+        ....
+        else
+        {
+          Queue<GameObject> queue = new Queue<GameObject>();
+          for (int i = 0; i < cacheCount; i++)
+          {
+            ...
+            ...
+            //enemy가 나오면 네트워크에서 spwan을 해준다. 추후 한번으로 수정할 예정
+            Enemy enemy = go.GetComponent<Enemy>();
+            if(enemy != null)
+            {
+              NetworkServer.Spawn(go);
+            }
+          }
+
+        Caches.Add(filePath, queue);
+        }
+        ```
+      </details> 
+
+> **<h3>Realization</h3>**
+  - NetWork상에 전달할 것들만을 따로 빼놓고 NetWorkBehavoiur를 상속받는 클래스를 생성해야 한다.
+  - NetworkManager는 공유변수인가?
+  - UnityEngine.Networking; 이란 뭔가
+  - System.Serializable 과 Serializable의 차이는?
+  - SyncVar란
+  - SetDirtyBit란
   <details><summary>코드 보기</summary>
 
+    ```c#
+    //FWNetworkManager.cs
+    else
+    {
+      Queue<GameObject> queue = new Queue<GameObject>();
+      for (int i = 0; i < cacheCount; i++)
+      {
+        GameObject go = Object.Instantiate<GameObject>(gameObject,parentTransform); //object에 있음 Bemonohavor를 상속하지 않아서
+        go.SetActive(false);
+        queue.Enqueue(go);  //넣어준다.
+
+        //enemy가 나오면 네트워크에서 spwan을 해준다. 추후 한번으로 수정할 예정
+        Enemy enemy = go.GetComponent<Enemy>();
+        if(enemy != null)
+        {
+           NetworkServer.Spawn(go);
+        }
+      }
+
+    Caches.Add(filePath, queue);
+    }
+    ```
   </details> 

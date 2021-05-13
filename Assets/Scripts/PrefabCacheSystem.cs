@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 [System.Serializable]
 public class PrefabsCacheData   //prefab의 데이터 ->총알,몬스터 등등
@@ -28,6 +29,13 @@ public class PrefabCacheSystem
                 GameObject go = Object.Instantiate<GameObject>(gameObject,parentTransform); //object에 있음 Bemonohavor를 상속하지 않아서
                 go.SetActive(false);
                 queue.Enqueue(go);  //넣어준다.
+
+                //enemy가 나오면 네트워크에서 spwan을 해준다. 추후 한번으로 수정할 예정
+                Enemy enemy = go.GetComponent<Enemy>();
+                if(enemy != null)
+                {
+                    NetworkServer.Spawn(go);
+                }
             }
 
             Caches.Add(filePath, queue);

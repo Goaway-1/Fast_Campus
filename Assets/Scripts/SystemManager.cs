@@ -32,7 +32,6 @@ public class SystemManager : MonoBehaviour
         get { return enemyTable; }
     }
 
-    //
     BaseSceneMain currentSceneMain;
     public BaseSceneMain CurrentSceneMain
     {
@@ -40,6 +39,14 @@ public class SystemManager : MonoBehaviour
         {
             currentSceneMain = value;
         }
+    }
+
+    [SerializeField]
+    NetworkConnectionInfo connectionInfo = new NetworkConnectionInfo();
+
+    public NetworkConnectionInfo ConnectionInfo
+    {
+        get { return connectionInfo; }
     }
 
     private void Awake()

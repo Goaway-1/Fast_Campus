@@ -2,20 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InputController : MonoBehaviour
+public class InputController
 {
-
-    void Update()
+    public void UpdateInput()
     {
-        if (SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().CurrentGameState != InGameSceneMain.GameState.Running)
+        if (SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().CurrentGameState != GameState.Running)
         {
             return;
         }
-        UpateInput();
+        UpateKeyboard();
         UpdateMouse();
     }
 
-    void UpateInput()
+    void UpateKeyboard()
     {
         Vector3 moveDirection = Vector3.zero;
         if(Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))

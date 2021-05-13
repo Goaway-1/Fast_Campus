@@ -20,15 +20,14 @@ public class EnemyManager : MonoBehaviour
 
     private void Start()
     {
-        Prepare();
-    }
-
-    private void Update()
-    {
+        //Prepare();
     }
 
     public bool GenerateEnemy(SquadronMemberStruct data)   //만들어줘라
     {
+        if (!((FWNetworkManager)FWNetworkManager.singleton).isServer)
+            return true;
+
         string FilePath = SystemManager.Instance.EnemyTable.GetEnemy(data.EnemyID).FilePath;
         GameObject go = SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().EnemyCacheSystem.Archive(FilePath);  //프리펩 호출
 
@@ -44,6 +43,9 @@ public class EnemyManager : MonoBehaviour
 
     public bool RemoveEnemy(Enemy enemy)    //삭제해라
     {
+        if (!((FWNetworkManager)FWNetworkManager.singleton).isServer)
+            return true;
+
         if (!enemies.Contains(enemy))   //키값이 아니라 이 오브젝트가 없다면
         {
             Debug.LogError("No exist Enemy");
@@ -57,10 +59,13 @@ public class EnemyManager : MonoBehaviour
 
     public void Prepare()   //초기 단체 생성
     {
+        if (!((FWNetworkManager)FWNetworkManager.singleton).isServer)
+            return;
+
         for (int i = 0; i < enemyFiles.Length; i++)
         {
             GameObject go = enemyFactory.Load(enemyFiles[i].filePath);
-            SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().EnemyCacheSystem.GenerateCache(enemyFiles[i].filePath, go, enemyFiles[i].cacheCount);
+            SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().EnemyCacheSystem.GenerateCache(enemyFiles[i].filePath, go, enemyFiles[i].cacheCount, this.transform);
         }
     }
 }

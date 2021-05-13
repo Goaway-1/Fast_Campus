@@ -5,10 +5,20 @@ using UnityEngine.Networking;   //HLAPI가 설치 되어있어야 지원한다.
 
 public class FWNetworkManager : NetworkManager
 {
+    public const int WaitingPlayerCount = 2; //2명을 기다리겠다.
+
+    int PlayerCount = 0;
+
+    public bool isServer
+    {
+        get;
+        private set;
+    }
+
     #region SERVER SID EVENT
     public override void OnServerConnect(NetworkConnection conn)    //서버연결시
     {
-        Debug.Log("OnSeverConnect call : " + conn.address);
+        Debug.Log("OnSeverConnect call : " + conn.address + "," + conn.connectionId);
         base.OnServerConnect(conn);
     }
 
@@ -19,8 +29,16 @@ public class FWNetworkManager : NetworkManager
     }
     public override void OnServerReady(NetworkConnection conn)  //서버가 준비되었을때
     {
-        Debug.Log("OnServerReady : " + conn.address);
+        Debug.Log("OnServerReady : " + conn.address + "," + conn.connectionId);
         base.OnServerReady(conn);
+
+        PlayerCount++;
+
+        if(PlayerCount >= WaitingPlayerCount)
+        {
+            InGameSceneMain inGameSceneMain = SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>();
+            inGameSceneMain.GameStart();
+        }
     }
     public override void OnServerError(NetworkConnection conn, int errorCode)   //서버가 오류를 발생했을때
     {
@@ -31,6 +49,13 @@ public class FWNetworkManager : NetworkManager
     {
         Debug.Log("OnServerDisconnect : " + conn.address);
         base.OnServerDisconnect(conn);
+    }
+
+    public override void OnStartServer()    //호스트로 접속할때만 들어옴
+    {
+        Debug.Log("OnStartSever");
+        base.OnStartServer();
+        isServer = true;
     }
     #endregion
 

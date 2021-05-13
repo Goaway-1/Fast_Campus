@@ -29,22 +29,37 @@ public class Player : Actor
     [SerializeField]
     float BulletSpeed = 1f;
 
-
+    InputController inputController = new InputController();
     protected override void Initialize()
     {
         base.Initialize();
         PlayerStatePanel playerStatePanel = PanelManager.GetPanel(typeof(PlayerStatePanel)) as PlayerStatePanel;
         playerStatePanel.SetHP(CurrentHP, MaxHP);   //초기화
 
-        if (isLocalPlayer)
-        {
-            SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().Hero = this;
-        }
+
+        InGameSceneMain inGameSceneMain = SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>();
+        if (isLocalPlayer) inGameSceneMain.Hero = this;
+
+        Transform startTransform;
+
+        if (isServer)   //서버인 경우
+            startTransform = inGameSceneMain.PlayerStartTransform1;
+        else
+            startTransform = inGameSceneMain.PlayerStartTransform2;
+
+        SetPosition(startTransform.position);
     }
 
     protected override void UpdateActor()   //Actor의 Update와 연관
     {
+        UpdateInput();
         UpdateMove();
+    }
+
+    [ClientCallback]    //내 클라이언트에서만 실행이된다.
+    public void UpdateInput()
+    {
+        inputController.UpdateInput();
     }
 
     void UpdateMove()
@@ -52,14 +67,34 @@ public class Player : Actor
         if (MoveVector.sqrMagnitude == 0)   //백터의 값이 모두 0인지 확인
             return;
 
-        MoveVector = AdjustMoveVector(MoveVector);
+        //정상적으로 NetworkBehaviour 인스턴스의 Update로 호출되어 실행시
+        //cmdMove()
 
-        //transform.position += MoveVector;
-        CmdMove(MoveVector);
+        // MonoBehaviour 인스턴스의 Update로 호출되어 실행되고 있을때의 꼼수
+        // 이경우 클라이언트로 접속하면 Command로 보내지지만 자기자신은 CmdMove를 실행하지 못함
+        if (isServer)
+        {
+            RpcMove(MoveVector);    //Host인 경우 RpcMove로 보내고
+        }
+        else
+        {
+            CmdMove(MoveVector);    //Client 플레이어인 경우 Cmd로 호스트를 보낸후 자기을 self 동작
+            if (isLocalPlayer)
+                transform.position += AdjustMoveVector(MoveVector);
+        }
     }
 
     [Command]   //Cmd형식은 Command로 동작 -> 클라이언트가 서버한테 보내는
     public void CmdMove(Vector3 moveVector)
+    {
+        this.MoveVector = moveVector;
+        transform.position += moveVector;
+        base.SetDirtyBit(1);            //MoveVector가 SyncVar인데 바뀌였다. (서버에 통보)
+        this.MoveVector = Vector3.zero; //타 플레이어가 보낸경우 Update를 통해 초기화 되지 않으므로 사용후 바로 초기화
+    }
+
+    [ClientRpc]     
+    public void RpcMove(Vector3 moveVector)
     {
         this.MoveVector = moveVector;
         transform.position += moveVector;
