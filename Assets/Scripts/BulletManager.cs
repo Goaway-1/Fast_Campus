@@ -12,12 +12,6 @@ public class BulletManager : MonoBehaviour
     PrefabsCacheData[] bulletFiles;
 
     Dictionary<string, GameObject> FileCache = new Dictionary<string, GameObject>();
-
-    private void Start()
-    {
-        Prepare();
-    }
-
     public GameObject Load(string resourcePath) //EnemyFactory의 Load와 유사
     {
         GameObject go = null;
@@ -41,6 +35,9 @@ public class BulletManager : MonoBehaviour
 
     public void Prepare()
     {
+        if (!((FWNetworkManager)FWNetworkManager.singleton).isServer)
+            return;
+
         for (int i = 0; i < bulletFiles.Length; i++)
         {
             GameObject go = Load(bulletFiles[i].filePath);
@@ -50,17 +47,22 @@ public class BulletManager : MonoBehaviour
 
     public Bullet Generate(int index)
     {
+        if (!((FWNetworkManager)FWNetworkManager.singleton).isServer)
+            return null;
+
         string filePath = bulletFiles[index].filePath;
         GameObject go = SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().BulletCacheSystem.Archive(filePath);
 
         Bullet bullet = go.GetComponent<Bullet>();
-        bullet.FilePath = filePath;
 
         return bullet;
     }
 
     public bool Remove(Bullet bullet)
     {
+        if (!((FWNetworkManager)FWNetworkManager.singleton).isServer)
+            return true;
+
         SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().BulletCacheSystem.Restore(bullet.FilePath, bullet.gameObject);
         return true;
     }

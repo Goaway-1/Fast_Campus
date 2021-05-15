@@ -6,17 +6,23 @@ using UnityEngine.Networking;
 public class Actor : NetworkBehaviour
 {
     [SerializeField]
+    [SyncVar]
     protected int MaxHP = 100;  //체력
 
     [SerializeField]
+    [SyncVar]
     protected int CurrentHP;    //현재 체력
 
     [SerializeField]
+    [SyncVar]
     protected int Damage = 1;   //총알 데미지
 
     [SerializeField]
+    [SyncVar]
     protected int crashDamage = 100;    //충돌 데미지
-
+    
+    [SerializeField]
+    [SyncVar]
     private bool isDead = false;
 
     public bool IsDead
@@ -117,6 +123,24 @@ public class Actor : NetworkBehaviour
     public void RpcSetActive(bool value)    //호스트에서만 호출 가능
     {
         this.gameObject.SetActive(value);
+        base.SetDirtyBit(1);
+    }
+
+    public void UpdateNetworkActor()
+    {
+        if (isServer) RpcUpdateNetworkActor();
+        else CmdUpdateNetworkActor();
+    }
+
+    [Command]
+    public void CmdUpdateNetworkActor()
+    {
+        base.SetDirtyBit(1);
+    }
+
+    [ClientRpc]
+    public void RpcUpdateNetworkActor()
+    {
         base.SetDirtyBit(1);
     }
 }

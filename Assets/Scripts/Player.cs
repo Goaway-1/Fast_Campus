@@ -30,6 +30,10 @@ public class Player : Actor
     float BulletSpeed = 1f;
 
     InputController inputController = new InputController();
+
+    [SyncVar]
+    bool Host = false; //Host 플레이어 판단
+
     protected override void Initialize()
     {
         base.Initialize();
@@ -40,9 +44,15 @@ public class Player : Actor
         InGameSceneMain inGameSceneMain = SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>();
         if (isLocalPlayer) inGameSceneMain.Hero = this;
 
+        if(isServer && isLocalPlayer)
+        {
+            Host = true;
+            UpdateNetworkActor();
+        }
+
         Transform startTransform;
 
-        if (isServer)   //서버인 경우
+        if (Host)   //서버인 경우
             startTransform = inGameSceneMain.PlayerStartTransform1;
         else
             startTransform = inGameSceneMain.PlayerStartTransform2;

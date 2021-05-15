@@ -2918,10 +2918,314 @@ Learning on a Fast_Campus
 - SyncVar란 : 상태 동기화관련 메서드, 로컬 클라이언트에서 호출, 설정한 오브젝트는 항상 플레이어에게 최신을 보여준다.
 - SetDirtyBit란 : snycvar를 통해 일반적인 직렬화가 가능하지만 복잡한 경우에 사용한다. => 커스터마이즈된 동기화
 
-## **05.13**
+## **05.14**
 
 > **<h3>Today Dev</h3>**
 
 - null
-  > **<h3>Realization</h3>**
+
+> **<h3>Realization</h3>**
+
+- null
+
+## **05.15**
+
+> **<h3>Today Dev</h3>**
+
+- ### Enemy 생성 동기화 (2) -> 이동에 관한 동기화프로
+
+  - <img src="Image/Sync_Enemy.gif" height="280" title="Sync_Enemy">
+    - Unity 에디터에서도 동기화가 되어 나타난다.
+  - Enemy의 FilePath를 별도의 필드를 사용하도록 수정 (sync를 제공하기 위해서)
+    <details><summary>코드 보기</summary>
+
+    ```c#
+    //Enemy.cs
+    [SyncVar]   //캐시 관련
+    [SerializeField]
+    string filePath;
+    public string FilePath
+    {
+      get { return filePath; }
+      set { filePath = value; }
+    }
+    ...
+    ...
+    protected override void Initialize()    //호스트로 부터 Enemy를 만들라고 수신
+    {
+      base.Initialize();
+      Debug.Log("Enemy : Initialize");
+      if (!((FWNetworkManager)FWNetworkManager.singleton).isServer)   //클라이언트 접속시 강제로 등록
+      {
+        InGameSceneMain inGameSceneMain = SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>();
+        transform.SetParent(inGameSceneMain.EnemyManager.transform);
+        inGameSceneMain.EnemyCacheSystem.Add(FilePath, gameObject);
+        gameObject.SetActive(false);
+      }
+    }
+    ```
+
+    </details>
+
+  - PrefabCacheSystem에서 FilePath를 입력, Archive와 Restore 메소드에서 Enemy일 경우 RpcSetActive 호출
+    <details><summary>코드 보기</summary>
+
+    ```c#
+    //PrefabCacheSystem.cs -> Archive()중 내용
+    Enemy enemy = go.GetComponent<Enemy>();
+    if(enemy != null)
+    {
+      enemy.RpcSetActive(true);
+    }
+    //PrefabCacheSystem.cs -> Restore()중 내용
+    Enemy enemy = gameObject.GetComponent<Enemy>();
+    if(enemy != null)
+    {
+      enemy.RpcSetActive(false);
+    }
+    //외부에서 EnemyCache를 추가할 수 있도록
+    public void Add(string filePath, GameObject gameObject)
+    {
+        Queue<GameObject> queue;
+        if (Caches.ContainsKey(filePath)) queue = Caches[filePath];
+        else
+        {
+            queue = new Queue<GameObject>();
+            Caches.Add(filePath, queue);
+        }
+
+        queue.Enqueue(gameObject);
+    }
+    ```
+
+    </details>
+
+  - EnemyManager의 FilePath 입력을 제거
+
+- ### Enemy 이동 동기화
+
+  - <img src="Image/Sync_Enemy_pos.gif" height="280" title="Sync_Enemy">
+    - Unity 에디터에서도 동기화가 되어 나타난다.
+  - Actor & Enemy 클래스의 주요 동기화 변수에 [SyncVar] 어트리뷰트 적용
+
+    - 모든 변수들(Hp,Damage...)을 [SyncVar] 적용 (테이블로부터 입력받는 값 전부)
+      <details><summary>코드 보기</summary>
+
+      ```c#
+      //Actor.cs
+      public void UpdateNetworkActor()
+      {
+        if (isServer) RpcUpdateNetworkActor();
+        else CmdUpdateNetworkActor();
+      }
+
+      [Command]
+      void CmdUpdateNetworkActor()
+      {
+        base.SetDirtyBit(1);
+      }
+
+      [ClientRpc]
+      public void RpcUpdateNetworkActor()
+      {
+        base.SetDirtyBit(1);
+      }
+      ///Enemy.cs -> Reset메서드 내부
+      ...
+      UpdateNetworkActor();
+      ```
+
+      </details>
+
+  - 주요 변수 변경 시 통보할 수 있도록 UpdateNetworkActor 메소드 추가 (Enemy의 Reset 메소드 끝에도)
+
+  - EnemyManager의 GenerateEnemy 내부에서 position을 직접 입력이 아닌 SetPosition 메소드 사용
+    <details><summary>코드 보기</summary>
+
+    ```c#
+    public bool GenerateEnemy(SquadronMemberStruct data)   //제작
+    {
+      ...
+      ...
+      Enemy enemy = go.GetComponent<Enemy>();
+      enemy.SetPosition(new Vector3(data.GeneratePointX, data.GeneratePointY, 0));  //네트워크를 통함
+      enemy.Reset(data);
+    }
+    ```
+
+    </details>
+
+- ### 총알 및 충돌 동기화
+- ### 동기화를 위한 Bullet 클래스 수정
+
+  - <img src="Image/Sync_Bullet.gif" height="300" title="Sync_Bullet">
+  - Bullet클래스를 NetworkBehaviour를 상속
+  - 주요변수에 SnycVar 어트리뷰트 적용
+    - Actor Owner로 적용해야 하지만 NetworkBehaviour 상속 받았기 때문에 되지 않는다. (추후수정)
+  - FilePath를 별도의 필드로 분리하여 SnycVar 적용
+  - Start에서 서버가 아닐 때 캐시에 등록하고 Parent 변경 처리
+    <details><summary>코드 보기</summary>
+
+    ```c#
+    void Start()
+    {
+      if (!((FWNetworkManager)FWNetworkManager.singleton).isServer)){
+        InGameSceneMain inGameSceneMain = SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>();
+        transform.SetParent(inGameSceneMain.BulletManager.transform);
+        inGameSceneMain.BulletCacheSystem.Add(FilePath, gameObject);
+        gameObject.SetActive(false);
+      }
+    }
+    ```
+
+    </details>
+
+  - RpcSetActive, SetPosition, UpdateNetworkBullet 메소드 추가
+    <details><summary>코드 보기</summary>
+
+    ```c#
+    [ClientRpc]
+    public void RpcSetActive(bool value)
+    {
+      this.gameObject.SetActive(value);
+      base.SetDirtyBit(1);
+    }
+
+    public void SetPosition(Vector3 position)
+    {
+      if (isServer) RpcSetPosition(position);   //Host의 경우
+      else                                    //Client의 경우
+      {
+        CmdSetPosition(position);
+        if (isLocalPlayer) transform.position = position;
+      }
+    }
+
+    [Command]
+    public void CmdSetPosition(Vector3 position)
+    {
+        this.transform.position = position;
+        base.SetDirtyBit(1);
+    }
+
+    [ClientRpc]
+    public void RpcSetPosition(Vector3 position)
+    {
+      this.transform.position = position;
+      base.SetDirtyBit(1);
+    }
+
+    public void UpdateNetworkBulltet()
+    {
+      if (isServer) RpcUpdateNetworkBullet();   //Host의 경우
+      else CmdUpdateNetworkBullet();            //Client의 경우
+    }
+
+    [Command]
+    public void CmdUpdateNetworkBullet()
+    {
+      base.SetDirtyBit(1);
+    }
+
+    [ClientRpc]
+    public void RpcUpdateNetworkBullet()
+    {
+      base.SetDirtyBit(1);
+    }
+    ```
+
+    </details>
+
+  - Fire 메소드의 firePosition 적용을 SetPosition 사용으로 변경 후 마지막에 UpdateNetworkBullet 호출
+    <details><summary>코드 보기</summary>
+
+    ```c#
+    public void Fire(Actor owner, Vector3 firePostion, Vector3 direction, float speed, int damage)  //외부에서 접근
+    {
+      Owner = owner;
+      SetPosition(firePostion);   //좌표변경
+      MoveDirection = direction;
+      Speed = speed;
+      Damage = damage;
+
+      NeedMove = true;
+      FireTime = Time.time;
+
+      UpdateNetworkBullet();  //지속적
+    }
+    ```
+
+    </details>
+
+- ### 동기화를 위한 총알 생성 수정
+
+  - BulletManager클래스의 Start의 Prepare 호출을 제거
+  - Prepare, Generate, Remove 메소드에서 서버가 아닐 경우 리턴 처리
+    <details><summary>코드 보기</summary>
+
+    ```c#
+    //각 메소드의 처음에 추가해준다.
+    if (!((FWNetworkManager)FWNetworkManager.singleton).isServer)
+      return;
+    ```
+
+    </details>
+
+  - PrefabCacheSystem에서 Bullet인 경우 별도 처리 (Enemy와 유사)
+    - GenerateCache,Archive, Restore 메서드들에서 똑같이 추가해주면 된다.
+  - InGameNetworkTransfer에서 BulletManager의 Prepare호출
+    <details><summary>코드 보기</summary>
+
+    ```c#
+    //호출 방식을 변경
+    [ClientRpc]
+    public void RpcGameStart()
+    {
+      ...
+      ...
+
+      InGameSceneMain inGameSceneMain = SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>();
+      inGameSceneMain.EnemyManager.Prepare();
+      inGameSceneMain.BulletManager.Prepare();
+    }
+    ```
+
+    </details>
+
+  - Player에 Host여부 판단 추가
+    <details><summary>코드 보기</summary>
+
+    ```c#
+    [SyncVar]
+    bool Host = false;  //Host의 여부
+
+    //Initialize()메서드에 추가
+    if(isServer && isLocalPlayer)
+    {
+      Host = true;
+      UpdateNetworkActor();
+    }
+    ```
+
+    </details>
+
+- ### 총알 Prefab 수정과 등록
+
+  - Bullet & EnemyBullet 프리펩에 NetworkIdentity 컴포넌트 추가
+  - LoadingScene을 열고 FWNetworkManager에 Bullet프리펩과 EnemyBullet프리펩 등록
+    - <img src="Image/NetworkManager.png" height="400" title="NetworkManager">
+    - NetwrokIdentity가 추가되어 있지 않고 프리펩에 추가하면 Spawn()메서드에서 오류발생
+
+> **<h3>Realization</h3>**
+
+- Sync에 사용하지 않는 값을 넘기게 되면 오류가 발생한다. (네트워크 상의)
+
+## **05.16**
+
+> **<h3>Today Dev</h3>**
+
+- null
+
+> **<h3>Realization</h3>**
+
 - null

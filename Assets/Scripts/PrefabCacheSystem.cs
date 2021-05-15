@@ -34,6 +34,15 @@ public class PrefabCacheSystem
                 Enemy enemy = go.GetComponent<Enemy>();
                 if(enemy != null)
                 {
+                    enemy.FilePath = filePath;
+                    NetworkServer.Spawn(go);
+                }
+
+                //bullet가 나오면 네트워크에서 spwan을 해준다. 추후 한번으로 수정할 예정
+                Bullet bullet = go.GetComponent<Bullet>();
+                if (bullet != null)
+                {
+                    bullet.FilePath = filePath;
                     NetworkServer.Spawn(go);
                 }
             }
@@ -59,6 +68,18 @@ public class PrefabCacheSystem
         GameObject go = Caches[filePath].Dequeue(); //정보들을 넘긴다.
         go.SetActive(true);
 
+        Enemy enemy = go.GetComponent<Enemy>();
+        if(enemy != null)
+        {
+            enemy.RpcSetActive(true);
+        }
+
+        Bullet bullet = go.GetComponent<Bullet>();
+        if (bullet != null)
+        {
+            bullet.RpcSetActive(true);
+        }
+
         return go;
     }
 
@@ -72,7 +93,31 @@ public class PrefabCacheSystem
 
         gameObject.SetActive(false);
 
+        Enemy enemy = gameObject.GetComponent<Enemy>();
+        if (enemy != null)
+        {
+            enemy.RpcSetActive(false);
+        }
+        Bullet bullet = gameObject.GetComponent<Bullet>();
+        if (bullet != null)
+        {
+            bullet.RpcSetActive(false);
+        }
+
         Caches[filePath].Enqueue(gameObject);   
         return true;
+    }
+
+    public void Add(string filePath, GameObject gameObject) //외부에서 EnemyCache를 추가할 수 있도록
+    {
+        Queue<GameObject> queue;
+        if (Caches.ContainsKey(filePath)) queue = Caches[filePath];
+        else
+        {
+            queue = new Queue<GameObject>();
+            Caches.Add(filePath, queue);
+        }
+
+        queue.Enqueue(gameObject);
     }
 }

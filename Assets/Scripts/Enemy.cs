@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class Enemy : Actor
 {
@@ -15,9 +16,11 @@ public class Enemy : Actor
     }
 
     [SerializeField]
+    [SyncVar]
     State CurrentState = State.None;        //현재 상태
 
     [SerializeField]
+    [SyncVar]
     Vector3 TargetPostion;  //현재 목표로인 위치
 
 
@@ -26,9 +29,13 @@ public class Enemy : Actor
     const float MaxSpeedTime = 0.5f;    //가속 시간
     
     [SerializeField]
+    [SyncVar]
     float CurrentSpeed;     //현재 속도
 
+    [SyncVar]
     Vector3 CurrentVelocity;
+
+    [SyncVar]
     float MoveStartTime = 0.0f; //움직이기 시작한 시간 --> 속도를 점점 증가 시키기 위함
 
     //총알과 관련
@@ -36,26 +43,44 @@ public class Enemy : Actor
     Transform FireTransform;
 
     [SerializeField]
-    GameObject Bullet;
-
-    [SerializeField]
+    [SyncVar]
     float BulletSpeed = 1f;
 
+    [SyncVar]
     float LastActionUpdateTime = 0.0f;  //언제 마지막으로 싸웠노
 
     [SerializeField]
+    [SyncVar]
     int FireRemainCount = 3;    //총알의 한계
 
+    [SerializeField]
+    [SyncVar]
     int GamePoint = 10; //게임 점수
 
-    //캐시 관련
+    [SyncVar]   //캐시 관련
+    [SerializeField]
+    string filePath;
     public string FilePath
     {
-        get; set;
+        get { return filePath; }
+        set { filePath = value; }
     }
 
     Vector3 AppearPoint;        //입장시 도착 위치
     Vector3 DisappearPoint;     //퇴장시 목표 위치
+
+    protected override void Initialize()    //호스트로 부터 Enemy를 만들라고 수신
+    {
+        base.Initialize();
+        Debug.Log("Enemy : Initialize");
+        if (!((FWNetworkManager)FWNetworkManager.singleton).isServer)   //클라이언트 접속시 강제로 등록
+        {
+            InGameSceneMain inGameSceneMain = SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>();
+            transform.SetParent(inGameSceneMain.EnemyManager.transform);
+            inGameSceneMain.EnemyCacheSystem.Add(FilePath, gameObject);
+            gameObject.SetActive(false);
+        }
+    }
 
     protected override void UpdateActor()
     {
@@ -136,6 +161,8 @@ public class Enemy : Actor
 
         CurrentState = State.Ready;
         LastActionUpdateTime = Time.time;
+
+        UpdateNetworkActor();
     }
 
     public void Appear(Vector3 targetPos)   //등장

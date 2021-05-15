@@ -1,35 +1,58 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class Bullet : MonoBehaviour
+public class Bullet : NetworkBehaviour
 {
     //발사 및 이동
     [SerializeField]
+    [SyncVar]
     Vector3 MoveDirection = Vector3.zero;
 
     [SerializeField]
-    float Speed = 10.0f;
+    [SyncVar]
+    float Speed = 0.0f;
 
+    [SyncVar]
     bool NeedMove = false;  //이동이 필요한지
 
     //충돌 감지
+    [SyncVar]
     bool Hited = false;
 
     //폭파 (시간, 거리)
     const float LifeTime = 15f; //시간
+
+    [SyncVar]
     float FireTime = 0;
 
+    [SyncVar]
     [SerializeField]
     int Damage = 1;
 
-    //현재 문제의 아이
-    Actor Owner;
+    [SerializeField]
+    Actor Owner;        //NetworkBehaviour 상속 클래스라 SyncVar가 되지 않는다.
+
+    [SyncVar]
+    [SerializeField]
+    string filePath;
 
     //캐싱관련
     public string FilePath
     {
-        get; set;
+        get { return filePath; }
+        set { filePath = value; }
+    }
+
+    void Start()
+    {
+        if (!((FWNetworkManager)FWNetworkManager.singleton).isServer){
+            InGameSceneMain inGameSceneMain = SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>();
+            transform.SetParent(inGameSceneMain.BulletManager.transform);
+            inGameSceneMain.BulletCacheSystem.Add(FilePath, gameObject);
+            gameObject.SetActive(false);
+        }
     }
 
     private void FixedUpdate()
@@ -55,13 +78,15 @@ public class Bullet : MonoBehaviour
     public void Fire(Actor owner, Vector3 firePostion, Vector3 direction, float speed, int damage)  //외부에서 접근
     {
         Owner = owner;
-        transform.position = firePostion;
+        SetPosition(firePostion);   //좌표변경
         MoveDirection = direction;
         Speed = speed;
         Damage = damage;
 
         NeedMove = true;
         FireTime = Time.time;
+
+        UpdateNetworkBullet();  //지속적
     }
 
     //움직이는데 안 닿을 수도 있다.
@@ -132,5 +157,54 @@ public class Bullet : MonoBehaviour
     void Disapper()
     {
         SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().BulletManager.Remove(this);
+    }
+
+    [ClientRpc]
+    public void RpcSetActive(bool value)
+    {
+        this.gameObject.SetActive(value);
+        base.SetDirtyBit(1);
+    }
+
+    public void SetPosition(Vector3 position)
+    {
+        if (isServer) RpcSetPosition(position);   //Host의 경우
+        else                                    //Client의 경우
+        {
+            CmdSetPosition(position);
+            if (isLocalPlayer) transform.position = position;
+        }
+    }
+
+    [Command]
+    public void CmdSetPosition(Vector3 position)
+    {
+        this.transform.position = position;
+        base.SetDirtyBit(1);
+    }
+
+    [ClientRpc]
+    public void RpcSetPosition(Vector3 position)
+    {
+        this.transform.position = position;
+        base.SetDirtyBit(1);
+    }
+
+    public void UpdateNetworkBullet()
+    {
+        if (isServer) RpcUpdateNetworkBullet();   //Host의 경우
+        else CmdUpdateNetworkBullet();            //Client의 경우
+    }
+    
+    [Command]
+    public void CmdUpdateNetworkBullet()
+    {
+        base.SetDirtyBit(1);
+    }
+
+    [ClientRpc]
+    public void RpcUpdateNetworkBullet()
+    {
+        base.SetDirtyBit(1);
     }
 }
