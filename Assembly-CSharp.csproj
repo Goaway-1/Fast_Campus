@@ -74,6 +74,7 @@
      <Compile Include="Assets\JMO Assets\WarFX\Demo\Assets\WFX_Demo_Wall.cs" />
      <Compile Include="Assets\JMO Assets\WarFX\Scripts\WFX_LightFlicker.cs" />
      <Compile Include="Assets\Scripts\SquadronTable.cs" />
+     <Compile Include="Assets\Scripts\ActorManager.cs" />
      <Compile Include="Assets\Scripts\GamePointAccumulator.cs" />
      <Compile Include="Assets\Scripts\SquadronScheduleTable.cs" />
      <Compile Include="Assets\Scripts\Bullet.cs" />

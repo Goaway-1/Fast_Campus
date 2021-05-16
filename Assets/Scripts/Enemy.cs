@@ -73,13 +73,17 @@ public class Enemy : Actor
     {
         base.Initialize();
         Debug.Log("Enemy : Initialize");
+
+        InGameSceneMain inGameSceneMain = SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>();
         if (!((FWNetworkManager)FWNetworkManager.singleton).isServer)   //클라이언트 접속시 강제로 등록
         {
-            InGameSceneMain inGameSceneMain = SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>();
             transform.SetParent(inGameSceneMain.EnemyManager.transform);
             inGameSceneMain.EnemyCacheSystem.Add(FilePath, gameObject);
             gameObject.SetActive(false);
         }
+
+        if (actorInstanceID != 0)
+            inGameSceneMain.ActorManager.Regist(actorInstanceID, this);
     }
 
     protected override void UpdateActor()
@@ -145,9 +149,20 @@ public class Enemy : Actor
 
     public void Reset(SquadronMemberStruct data)   //초기화 담당
     {
+        if (isServer)
+            RpcReset(data);
+        else
+        {
+            CmdReset(data);
+            if (isLocalPlayer)
+                ResetData(data);
+        }
+    }
+
+    void ResetData(SquadronMemberStruct data)
+    {
         EnemyStruct enemyStruct = SystemManager.Instance.EnemyTable.GetEnemy(data.EnemyID);
 
-        //Enemy 관련
         CurrentHP = MaxHP = enemyStruct.MaxHP;
         Damage = enemyStruct.Damage;
         crashDamage = enemyStruct.CrashDamage;
@@ -156,13 +171,13 @@ public class Enemy : Actor
         GamePoint = enemyStruct.GamePoint;
 
         //Squadron 관련
-        AppearPoint = new Vector3(data.AppearPointX, data.AppearPointY,0);
+        AppearPoint = new Vector3(data.AppearPointX, data.AppearPointY, 0);
         DisappearPoint = new Vector3(data.DisappearPointX, data.DisappearPointY, 0);
 
         CurrentState = State.Ready;
         LastActionUpdateTime = Time.time;
 
-        UpdateNetworkActor();
+        isDead = false;     //Enemy는 재사용되기 때문에 초기화시켜주어야 한다.
     }
 
     public void Appear(Vector3 targetPos)   //등장
@@ -214,25 +229,20 @@ public class Enemy : Actor
                 Vector3 crashPos = player.transform.position + box.center;
                 crashPos.x += box.size.x * 0.5f;
 
-                player.OnCrash(this, crashDamage, crashPos);
+                player.OnCrash( crashDamage, crashPos);
             }
         }
-    }
-
-    public override void OnCrash(Actor attacker, int damage, Vector3 crachPos)    //내가 부딪친거
-    {
-        base.OnCrash(attacker, damage, crachPos);
     }
 
     public void Fire()
     {
         Bullet bullet = SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().BulletManager.Generate(BulletManager.EnemyBulletIndex);
-        bullet.Fire(this, FireTransform.position, -FireTransform.right, BulletSpeed, Damage);
+        bullet.Fire(actorInstanceID, FireTransform.position, -FireTransform.right, BulletSpeed, Damage);
     }
 
-    protected override void OnDead(Actor killer)
+    protected override void OnDead()
     {
-        base.OnDead(killer);
+        base.OnDead();
 
         SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().GamePointAccumulator.Accumulate(GamePoint);
         SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().EnemyManager.RemoveEnemy(this);
@@ -240,11 +250,25 @@ public class Enemy : Actor
         CurrentState = State.Dead;
     }
 
-    protected override void DecreaseHP(Actor attacker, int value, Vector3 damagePos)
+    protected override void DecreaseHP(int value, Vector3 damagePos)
     {
-        base.DecreaseHP(attacker, value, damagePos);
+        base.DecreaseHP(value, damagePos);
 
         Vector3 damagePoint = damagePos + Random.insideUnitSphere * 0.5f;
         SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().DamageManager.Generate(DamageManager.EnemyDamageIndex, damagePoint, value, Color.magenta);
+    }
+
+    [Command]
+    public void CmdReset(SquadronMemberStruct data)
+    {
+        ResetData(data);
+        base.SetDirtyBit(1);
+    }
+
+    [ClientRpc]
+    public void RpcReset(SquadronMemberStruct data)
+    {
+        ResetData(data);
+        base.SetDirtyBit(1);
     }
 }

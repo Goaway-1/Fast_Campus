@@ -9,9 +9,19 @@ public class Actor : NetworkBehaviour
     [SyncVar]
     protected int MaxHP = 100;  //체력
 
+    public int HpMax
+    {
+        get { return MaxHP; }
+    }
+
     [SerializeField]
     [SyncVar]
     protected int CurrentHP;    //현재 체력
+
+    public int HPCurrent
+    {
+        get { return CurrentHP; }
+    }
 
     [SerializeField]
     [SyncVar]
@@ -23,7 +33,7 @@ public class Actor : NetworkBehaviour
     
     [SerializeField]
     [SyncVar]
-    private bool isDead = false;
+    protected bool isDead = false;
 
     public bool IsDead
     {
@@ -35,6 +45,14 @@ public class Actor : NetworkBehaviour
         get { return crashDamage; }
     }
 
+    [SyncVar]
+    protected int actorInstanceID = 0;  //서버의 아이디
+
+    public int ActorInstanceID
+    {
+        get { return actorInstanceID; }
+    }
+
     private void Start()
     {
         Initialize();
@@ -43,6 +61,12 @@ public class Actor : NetworkBehaviour
     protected virtual void Initialize()
     {
         CurrentHP = MaxHP;
+
+        if (isServer)   //Host
+        {
+            actorInstanceID = GetInstanceID();      //각각의 오브젝트마다 ID가 있다.
+            RpcSetActorInstanceID(actorInstanceID);
+        }
     }
 
     private void Update()
@@ -54,19 +78,36 @@ public class Actor : NetworkBehaviour
 
     }
 
-    public virtual void OnBulletHited(Actor attacker, int damage, Vector3 hitPos)   //총알에 피격시
+    public virtual void OnBulletHited(int damage, Vector3 hitPos)   //총알에 피격시
     {
         Debug.Log("OnBulletHited damage = " + damage);
-        DecreaseHP(attacker,damage,hitPos);
+        DecreaseHP(damage,hitPos);
     }
 
-    public virtual void OnCrash(Actor attacker,int damage, Vector3 crashPos)     //기체에 피격시
+    public virtual void OnCrash(int damage, Vector3 crashPos)     //기체에 피격시
     {
         Debug.Log("OnCrash damage = " + damage);
-        DecreaseHP(attacker,damage, crashPos);
+        DecreaseHP(damage, crashPos);
     }
 
-    protected virtual void DecreaseHP(Actor attacker, int value, Vector3 damagePos)  //체력 감소 (외불 호출 X)
+    protected virtual void DecreaseHP(int value, Vector3 damagePos)  //체력 감소 (외부 호출)
+    {
+        if (isDead)
+            return;
+
+        if (isServer)
+        {
+            RpcDecreasedHP(value, damagePos);
+        }
+        else
+        {
+            CmdDecreasedHP(value, damagePos);
+            if (isLocalPlayer)
+                InternalDecreaseHP(value, damagePos);
+        }
+    }
+
+    protected virtual void InternalDecreaseHP(int value, Vector3 damagePos)  //체력 감소 (내부 호출)
     {
         if (isDead)
             return;
@@ -77,10 +118,10 @@ public class Actor : NetworkBehaviour
             CurrentHP = 0;
 
         if (CurrentHP == 0)
-            OnDead(attacker);
+            OnDead();
     }
 
-    protected virtual void OnDead(Actor killer)
+    protected virtual void OnDead()
     {
         Debug.Log(name + "OnDead");
         isDead = true;
@@ -141,6 +182,31 @@ public class Actor : NetworkBehaviour
     [ClientRpc]
     public void RpcUpdateNetworkActor()
     {
+        base.SetDirtyBit(1);
+    }
+
+    [ClientRpc]
+    public void RpcSetActorInstanceID(int instID)
+    {
+        this.actorInstanceID = instID;
+
+        if (this.actorInstanceID != 0)
+            SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().ActorManager.Regist(this.actorInstanceID, this);
+
+        base.SetDirtyBit(1);
+    }
+
+    [Command]
+    public void CmdDecreasedHP(int value, Vector3 damagePos)
+    {
+        InternalDecreaseHP(value, damagePos);
+        base.SetDirtyBit(1);
+    }
+
+    [ClientRpc]
+    public void RpcDecreasedHP(int value, Vector3 damagePos)
+    {
+        InternalDecreaseHP(value, damagePos);
         base.SetDirtyBit(1);
     }
 }

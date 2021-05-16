@@ -9,6 +9,11 @@ public class BasePanel : MonoBehaviour
         InitializePanel();
     }
 
+    private void Update()
+    {
+        UpdatePanel();
+    }
+
     private void OnDestroy()    //ÆÄ±«µÉ¶§
     {
         DestroyPanel();
@@ -36,5 +41,10 @@ public class BasePanel : MonoBehaviour
     public virtual void Close()
     {
         gameObject.SetActive(false);
+    }
+
+    public virtual void UpdatePanel()
+    {
+
     }
 }

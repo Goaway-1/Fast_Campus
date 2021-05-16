@@ -31,8 +31,9 @@ public class Bullet : NetworkBehaviour
     [SerializeField]
     int Damage = 1;
 
+    [SyncVar]
     [SerializeField]
-    Actor Owner;        //NetworkBehaviour 상속 클래스라 SyncVar가 되지 않는다.
+    int OwnerInstancID; //Owner 해결
 
     [SyncVar]
     [SerializeField]
@@ -75,9 +76,9 @@ public class Bullet : NetworkBehaviour
         transform.position += moveVector;
     }
 
-    public void Fire(Actor owner, Vector3 firePostion, Vector3 direction, float speed, int damage)  //외부에서 접근
+    public void Fire(int ownerInstanceID, Vector3 firePostion, Vector3 direction, float speed, int damage)  //외부에서 접근
     {
-        Owner = owner;
+        OwnerInstancID = ownerInstanceID;
         SetPosition(firePostion);   //좌표변경
         MoveDirection = direction;
         Speed = speed;
@@ -115,11 +116,12 @@ public class Bullet : NetworkBehaviour
             return;
         }
 
+        Actor owner = SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().ActorManager.GetActor(OwnerInstancID);
         Actor actor = collider.GetComponentInParent<Actor>();   //이거 뭔지봐보바봐보바ㅗ바ㅗ바봐
-        if (actor && actor.IsDead || actor.gameObject.layer == Owner.gameObject.layer) 
+        if (actor && actor.IsDead || actor.gameObject.layer == owner.gameObject.layer) 
             return;
 
-        actor.OnBulletHited(Owner, Damage, transform.position);
+        actor.OnBulletHited(Damage, transform.position);
 
         Collider myCollider = GetComponentInChildren<Collider>();
         myCollider.enabled = false;

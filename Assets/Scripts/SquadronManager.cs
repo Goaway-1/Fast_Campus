@@ -6,7 +6,7 @@ public class SquadronManager : MonoBehaviour
 {
     float GameStartedTime;  //시작시간
 
-    int SquadronIndex;      //몇개만들껀디
+    int ScheduleIndex;      //몇개만들껀디
 
     [SerializeField]
     SquadronTable[] squadronDatas;
@@ -34,7 +34,7 @@ public class SquadronManager : MonoBehaviour
     public void StartGame() //게임 시작
     {
         GameStartedTime = Time.time;
-        SquadronIndex = 0;
+        ScheduleIndex = 0;
         running = true;
         Debug.Log("Game Started!");
     }
@@ -44,12 +44,14 @@ public class SquadronManager : MonoBehaviour
         if (!running)
             return;
 
-        if(Time.time - GameStartedTime >= squadronScheduleTable.GetScheduleData(SquadronIndex).GenerateTime)
-        {
-            GenerateSquadron(squadronDatas[SquadronIndex]);
-            SquadronIndex++;
+        SquadronScheduleDataStruct data = squadronScheduleTable.GetScheduleData(ScheduleIndex);
 
-            if (SquadronIndex >= squadronDatas.Length)
+        if(Time.time - GameStartedTime >= data.GenerateTime)
+        {
+            GenerateSquadron(squadronDatas[data.SquadronID]);
+            ScheduleIndex++;
+
+            if (ScheduleIndex >= squadronScheduleTable.GetDataCount())
             {
                 AllSquadronGenerated();
                 return;
@@ -58,7 +60,7 @@ public class SquadronManager : MonoBehaviour
     }
     void GenerateSquadron(SquadronTable table)    //스쿼드론 생성
     {
-        Debug.Log("GenerateSquadron");
+        Debug.Log("GenerateSquadron : " + ScheduleIndex);
         for (int i = 0; i < table.GetCount(); i++)
         {
             SquadronMemberStruct squadronMember = table.GetSquadronMember(i);

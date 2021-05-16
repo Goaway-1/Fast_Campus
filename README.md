@@ -3062,6 +3062,7 @@ Learning on a Fast_Campus
   - Bullet클래스를 NetworkBehaviour를 상속
   - 주요변수에 SnycVar 어트리뷰트 적용
     - Actor Owner로 적용해야 하지만 NetworkBehaviour 상속 받았기 때문에 되지 않는다. (추후수정)
+    - [수정 후](#Actor-수정)
   - FilePath를 별도의 필드로 분리하여 SnycVar 적용
   - Start에서 서버가 아닐 때 캐시에 등록하고 Parent 변경 처리
     <details><summary>코드 보기</summary>
@@ -3224,7 +3225,314 @@ Learning on a Fast_Campus
 
 > **<h3>Today Dev</h3>**
 
-- null
+- ### 총알 충돌시 Owner 참조를 위한 수정
+
+  - <img src="Image/Sync_Bullet_2.gif" height="400" title="Sync_Bullet_2">
+  - 총알 충돌시에 대한 정보가 빠져있어 참조를 추가하기 위함
+  - ID로 Actor를 참조하기 위한 클래스 ActorManager 제작
+  - ActorManager는 InGameMain이 소유하며 접근자를 제공
+    <details><summary>코드 보기</summary>
+
+    ```c#
+    ActorManager actorManager = new ActorManager();
+
+    public ActorManager ActorManager
+    {
+      get { return actorManager; }
+    }
+    ```
+
+    </details>
+
+  - Actor에 서버의 InstanceID를 담아둘 변수를 선언하고 SyncVar 어트리뷰트 적용
+    <details><summary>코드 보기</summary>
+
+    ```c#
+    [SyncVar]
+    protected int actorInstanceID = 0;
+
+    public int ActorInstance
+    {
+      get { return actorInstanceID; }
+    }
+    //Initialize에서 서버인 경우 오브젝트에 번호 할당
+    protected virtual void Initialize()
+    {
+      CurrentHP = MaxHP;
+
+      if (isServer)   //Host
+      {
+        actorInstanceID = GetInstanceID();      //각각의 오브젝트마다 ID가 있다.
+        RpcSetActorInstanceID(actorInstanceID);
+      }
+    }
+    //서버 할당의 모습 -> ActorManager에서 할당
+    [ClientRpc]
+    public void RpcSetActorInstanceID(int instID)
+    {
+      this.actorInstanceID = instID;
+
+      if (this.actorInstanceID != 0)
+        SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().ActorManager.Regist(this.actorInstanceID, this);
+
+      base.SetDirtyBit(1);
+    }
+    ```
+
+    </details>
+
+  - 서버의 InstanceID를 확보하고 Rpc로 전송하여 ActorManager에 등록
+  - 발사를 할시 처리할 과정들
+
+    - Enemy와 Player 초기화시에 ActorManager에 등록
+      <details><summary>코드 보기</summary>
+
+      ```c#
+      //Enemy
+      protected override void Initialize()    //호스트로 부터 Enemy를 만들라고 수신
+      {
+        base.Initialize();
+        Debug.Log("Enemy : Initialize");
+
+        InGameSceneMain inGameSceneMain = SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>();
+        if (!((FWNetworkManager)FWNetworkManager.singleton).isServer)   //클라이언트 접속시 강제로 등록
+        {
+          transform.SetParent(inGameSceneMain.EnemyManager.transform);
+          inGameSceneMain.EnemyCacheSystem.Add(FilePath, gameObject);
+          gameObject.SetActive(false);
+        }
+
+        if (actorInstanceID != 0) //등록
+          inGameSceneMain.ActorManager.Regist(actorInstanceID, this);
+      }
+      //Player
+      if (actorInstanceID != 0)
+        inGameSceneMain.ActorManager.Regist(actorInstanceID, this);
+      ```
+
+      </details>
+
+    - Bullet 클래스의 Owner 변수를 제거하고 int형 OwnerInstanceID를 SyncVar로 추가
+
+      - ### Actor-수정
+
+        <details><summary>코드 보기</summary>
+
+        ```c#
+        [SyncVar]
+        [SerializeField]
+        int OwnerInstancID; //Owner 해결
+
+        //Fire()메소드
+        OwnerInstancID = owner.ActorInstanceID;
+
+        //OnBulletCollision() 메소드
+        Actor owner = SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().ActorManager.GetActor(OwnerInstancID);
+        Actor actor = collider.GetComponentInParent<Actor>();   //이거 뭔지봐보바봐보바ㅗ바ㅗ바봐
+        if (actor && actor.IsDead || actor.gameObject.layer == owner.gameObject.layer)
+          return;
+
+        actor.OnBulletHited(owner, Damage, transform.position);
+        ```
+
+        </details>
+
+    - Fire 메소드에서 Owner 대신 OnwerInstanceID를 저장
+    - OnBulletCollision 메소드에서 OwnerInstanceID를 인자로 해서 ActorManager에서 Owner를 구해서 처리
+
+- ### Client로 접속 시 총알 발사 처리
+
+  - Bullet의 Fire첫번째 인자를 Actor에서 int형의 instanceID로 변경 -> 매게변수 Owner 삭제
+    <details><summary>코드 보기</summary>
+
+    ```c#
+    public void Fire(int ownerInstanceID, Vector3 firePostion, Vector3 direction, float speed, int damage)  //Actoer 삭제
+    {
+    ```
+
+    </details>
+
+  - Enemy, Player 발사 시 호출 인자 변경
+  - Player CmdFire 메소드 추가
+  - Player의 Fire에서 Host가 아닌경우 CmdFire를 호출
+    <details><summary>코드 보기</summary>
+
+    ```c#
+    //Enemy.cs -> Fire()메소드
+    bullet.Fire(actorInstanceID, FireTransform.position, -FireTransform.right, BulletSpeed, Damage);
+    //Player.cs
+    protected override void Initialize()
+    {
+      base.Initialize();
+
+      ...
+      ...
+
+      if(isServer && isLocalPlayer)
+      {
+        Host = true;
+        RpcSetHost();
+      }
+      ...
+      ...
+    }
+    [ClientRpc]
+    public void RpcSetHost()
+    {
+      Host = true;
+      base.SetDirtyBit(1);
+    }
+    //Player.cs -> Fire()메소드
+    public void Fire()
+    {
+      if (Host)
+      {
+        Bullet bullet = SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().BulletManager.Generate(BulletManager.PlayerBulletIndex);
+        bullet.Fire(actorInstanceID, FireTransform.position, FireTransform.right, BulletSpeed, Damage);
+      }
+      else
+      {
+        CmdFire(actorInstanceID, FireTransform.position, FireTransform.right, BulletSpeed, Damage);
+      }
+    }
+
+    [Command]
+    public void CmdFire(int ownerInstanceID, Vector3 firePosition, Vector3 direction, float speed, int damage)
+    {
+      Bullet bullet = SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().BulletManager.Generate(BulletManager.PlayerBulletIndex);
+      bullet.Fire(ownerInstanceID, firePosition, direction, speed, damage);
+      base.SetDirtyBit(1);
+    }
+    ```
+
+    </details>
+
+- ### 기존 Squdron의 오류를 수정
+
+- ### 총알 및 적 충돌 동기화
+
+  - 불필요해진 Actor 계열의 OnDead로 받던 Killer인자 제거
+  - Enemy 초기화를 수정
+    <details><summary>코드 보기</summary>
+
+    ```c#
+    public void Reset(SquadronMemberStruct data)   //초기화 담당
+    {
+      if (isServer)
+        RpcReset(data);
+      else
+      {
+        CmdReset(data);
+        if (isLocalPlayer)
+          ResetData(data);
+      }
+    }
+
+    void ResetData(SquadronMemberStruct data)
+    {
+      ...
+      ...
+      isDead = false;     //Enemy는 재사용되기 때문에 초기화시켜주어야 한다.
+    }
+
+    [Command]
+    public void CmdReset(SquadronMemberStruct data)
+    {
+      ResetData(data);
+      base.SetDirtyBit(1);
+    }
+
+    [ClientRpc]
+    public void RpcReset(SquadronMemberStruct data)
+    {
+      ResetData(data);
+      base.SetDirtyBit(1);
+    }
+    ```
+
+    </details>
+
+  - PlayerStatePanel에서 Hero를 참조하도록 수정해서 Player내부에서 호출을 제거
+    <details><summary>코드 보기</summary>
+
+    ```c#
+    Player hero = null;
+    Player Hero
+    {
+      get
+      {
+        if (hero == null)
+          hero = SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().Hero;
+          return hero;
+      }
+    }
+    public override void InitializePanel()
+    {
+      base.InitializePanel();
+      HPGage.SetHP(100, 100);
+    }
+
+    public override void UpdatePanel()
+    {
+      base.UpdatePanel();
+      if (Hero != null) HPGage.SetHP(Hero.HPCurrent, Hero.HpMax);
+    }
+    ```
+
+    </details>
+
+  - DecreaseHp 메소드에서 호스트와 클라이언트간 동기화 메소드를 호출하도록 수정
+    <details><summary>코드 보기</summary>
+
+    ```c#
+    //DecreaseHp -> InternalDecreasedHp로 변경
+    protected virtual void DecreaseHP(int value, Vector3 damagePos)  //체력 감소 (외불 호출 X)
+    {
+      if (isDead)
+        return;
+
+      if (isServer)
+      {
+        RpcDecreasedHP(value, damagePos);
+      }
+      else
+      {
+        CmdDecreasedHp(value, damagePos);
+        if (isLocalPlayer)
+          InternalDecreaseHP(value, damagePos);
+      }
+    }
+
+    protected virtual void InternalDecreaseHP(int value, Vector3 damagePos)  //체력 감소 (외불 호출 X)
+    {
+      if (isDead)
+        return;
+
+      CurrentHP -= value;
+
+      if (CurrentHP < 0)
+        CurrentHP = 0;
+
+      if (CurrentHP == 0)
+        OnDead();
+    }
+
+    [Command]
+    public void CmdDecreasedHP(int value, Vector3 damagePos)
+    {
+      InternalDecreaseHP(value, damagePos);
+      base.SetDirtyBit(1);
+    }
+
+    [ClientRpc]
+    public void RpcDecreasedHP(int value, Vector3 damagePos)
+    {
+      InternalDecreaseHP(value, damagePos);
+      base.SetDirtyBit(1);
+    }
+    ```
+
+    </details>
 
 > **<h3>Realization</h3>**
 

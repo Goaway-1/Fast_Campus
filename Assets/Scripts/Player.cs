@@ -31,15 +31,13 @@ public class Player : Actor
 
     InputController inputController = new InputController();
 
+    [SerializeField]
     [SyncVar]
     bool Host = false; //Host 플레이어 판단
 
     protected override void Initialize()
     {
         base.Initialize();
-        PlayerStatePanel playerStatePanel = PanelManager.GetPanel(typeof(PlayerStatePanel)) as PlayerStatePanel;
-        playerStatePanel.SetHP(CurrentHP, MaxHP);   //초기화
-
 
         InGameSceneMain inGameSceneMain = SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>();
         if (isLocalPlayer) inGameSceneMain.Hero = this;
@@ -47,7 +45,7 @@ public class Player : Actor
         if(isServer && isLocalPlayer)
         {
             Host = true;
-            UpdateNetworkActor();
+            RpcSetHost();
         }
 
         Transform startTransform;
@@ -58,6 +56,9 @@ public class Player : Actor
             startTransform = inGameSceneMain.PlayerStartTransform2;
 
         SetPosition(startTransform.position);
+
+        if (actorInstanceID != 0)
+            inGameSceneMain.ActorManager.Regist(actorInstanceID, this);
     }
 
     protected override void UpdateActor()   //Actor의 Update와 연관
@@ -152,35 +153,50 @@ public class Player : Actor
                 Vector3 crashPos = enemy.transform.position + box.center;
                 crashPos.x += box.size.x * 0.5f;
 
-                enemy.OnCrash(this, crashDamage, crashPos);
+                enemy.OnCrash(crashDamage, crashPos);
             }
         }
     }
 
-    public override void OnCrash(Actor attacker, int damage, Vector3 crashPos)    //내가 부딪친거
-    {
-        base.OnCrash(attacker, damage, crashPos);
-    }
-
     public void Fire()
     {
-        Bullet bullet = SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().BulletManager.Generate(BulletManager.PlayerBulletIndex);
-        bullet.Fire(this, FireTransform.position, FireTransform.right, BulletSpeed, Damage);
+        if (Host)
+        {
+            Bullet bullet = SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().BulletManager.Generate(BulletManager.PlayerBulletIndex);
+            bullet.Fire(actorInstanceID, FireTransform.position, FireTransform.right, BulletSpeed, Damage);
+        }
+        else
+        {
+            CmdFire(actorInstanceID, FireTransform.position, FireTransform.right, BulletSpeed, Damage);
+        }
+        
     }
-    protected override void DecreaseHP(Actor attacker, int value, Vector3 damagePos)
+
+    [Command]
+    public void CmdFire(int ownerInstanceID, Vector3 firePosition, Vector3 direction, float speed, int damage)
     {
-        base.DecreaseHP(attacker, value, damagePos);
-        //반환시 BasePanel이 반환되기 때문에 as PlayerStatePanel로 변환해줌
-        PlayerStatePanel playerStatePanel = PanelManager.GetPanel(typeof(PlayerStatePanel)) as PlayerStatePanel;
-        playerStatePanel.SetHP(CurrentHP, MaxHP);
+        Bullet bullet = SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().BulletManager.Generate(BulletManager.PlayerBulletIndex);
+        bullet.Fire(ownerInstanceID, firePosition, direction, speed, damage);
+        base.SetDirtyBit(1);
+    }
+    protected override void DecreaseHP(int value, Vector3 damagePos)
+    {
+        base.DecreaseHP(value, damagePos);
 
         Vector3 damagePoint = damagePos + Random.insideUnitSphere * 0.5f;
         SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>().DamageManager.Generate(DamageManager.PlayerDamageIndex, damagePoint, value, Color.red);
     }
 
-    protected override void OnDead(Actor killer)
+    protected override void OnDead()
     {
-        base.OnDead(killer);
+        base.OnDead();
         gameObject.SetActive(false);
+    }
+
+    [ClientRpc]
+    public void RpcSetHost()
+    {
+        Host = true;
+        base.SetDirtyBit(1);
     }
 }

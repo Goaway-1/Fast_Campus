@@ -20,7 +20,7 @@ public class InGameSceneMain : BaseSceneMain
         {
             if (!player)
             {
-                Debug.LogError("Main Player is not Setted!");
+                Debug.LogWarning("Main Player is not Setted!");
             }
             return player;
         }
@@ -128,6 +128,13 @@ public class InGameSceneMain : BaseSceneMain
     public Transform PlayerStartTransform2
     {
         get { return playerStartTransform2; }
+    }
+
+    ActorManager actorManager = new ActorManager();
+
+    public ActorManager ActorManager
+    {
+        get { return actorManager; }
     }
 
     public void GameStart()
