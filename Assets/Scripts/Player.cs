@@ -4,7 +4,9 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 public class Player : Actor
-{  
+{
+    const string PlayerHUDPath = "Prefabs/PlayerHUD";   //정적인 주소
+
     //이동과 관련
     [SerializeField]
     [SyncVar]           //이게 뭔데
@@ -35,6 +37,9 @@ public class Player : Actor
     [SyncVar]
     bool Host = false; //Host 플레이어 판단
 
+    [SerializeField]
+    Material ClientPlayerMaterial;  //플레이어 구분용도 (색상)
+
     protected override void Initialize()
     {
         base.Initialize();
@@ -53,12 +58,27 @@ public class Player : Actor
         if (Host)   //서버인 경우
             startTransform = inGameSceneMain.PlayerStartTransform1;
         else
+        {
             startTransform = inGameSceneMain.PlayerStartTransform2;
+            MeshRenderer meshRenderer = GetComponentInChildren<MeshRenderer>();
+            meshRenderer.material = ClientPlayerMaterial;
+        }
 
         SetPosition(startTransform.position);
 
         if (actorInstanceID != 0)
             inGameSceneMain.ActorManager.Regist(actorInstanceID, this);
+
+        InitializePlayerUHD();
+    }
+
+    void InitializePlayerUHD()
+    {
+        InGameSceneMain inGameSceneMain = SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>();
+        GameObject go = Resources.Load<GameObject>(PlayerHUDPath);
+        GameObject goInstance = Instantiate<GameObject>(go, inGameSceneMain.DamageManager.CanvasTransform);
+        PlayerHUD playerHUD = goInstance.GetComponent<PlayerHUD>();
+        playerHUD.Initialize(this);
     }
 
     protected override void UpdateActor()   //Actor의 Update와 연관

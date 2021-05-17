@@ -2920,7 +2920,7 @@ Learning on a Fast_Campus
 
 ## **05.14**
 
-> **<h3>Today Dev</h3>**
+> **<h3>Today Dev Story</h3>**
 
 - null
 
@@ -2930,7 +2930,7 @@ Learning on a Fast_Campus
 
 ## **05.15**
 
-> **<h3>Today Dev</h3>**
+> **<h3>Today Dev Story</h3>**
 
 - ### Enemy 생성 동기화 (2) -> 이동에 관한 동기화프로
 
@@ -3223,7 +3223,7 @@ Learning on a Fast_Campus
 
 ## **05.16**
 
-> **<h3>Today Dev</h3>**
+> **<h3>Today Dev Story</h3>**
 
 - ### 총알 충돌시 Owner 참조를 위한 수정
 
@@ -3537,3 +3537,120 @@ Learning on a Fast_Campus
 > **<h3>Realization</h3>**
 
 - null
+
+## **05.16**
+
+> **<h3>Today Dev Story</h3>**
+
+- ### 추가적인 멀티플레이 관련 처리
+- ### Player 구분하기(색상)
+
+  - <img src="Image/Player_Color.gif" height="350" title="Player_Color">
+  - Player 클래스에 SerializeField로 Material 변수 추가
+  - Initialize 메소드에서 Host가 아닌 경우 MeshRenderer를 구해 Material을 교체하도록 코드 작성
+  - Player 프리펩을 선택하고 추가한 Material변수에 다른 Material을 설정
+    <details><summary>코드 보기</summary>
+
+    ```c#
+    [SerializeField]
+    Material ClientPlayerMaterial;  //플레이어 구분용도 (색상)
+    //Initialize() 메소드
+    if (Host)   //서버인 경우
+      startTransform = inGameSceneMain.PlayerStartTransform1;
+    else
+    {
+      startTransform = inGameSceneMain.PlayerStartTransform2;
+      MeshRenderer meshRenderer = GetComponentInChildren<MeshRenderer>();
+      meshRenderer.material = ClientPlayerMaterial;
+    }
+
+    ```
+
+    </details>
+
+- ### Player 객체에 속한 HPGage
+
+  - <img src="Image/Sync_Hp.gif" height="350" title="Sync_Hp">
+  - 상대 Player의 Hp정보를 볼 수 있는 UI
+  - DamageManager의 CanvasTransform 프로퍼티 추가
+  - PlayerHUD 스크립트 작성
+    <details><summary>코드 보기</summary>
+
+    ```c#
+    public class PlayerHUD : MonoBehaviour
+    {
+      [SerializeField]
+      Gage HPGage;
+
+      [SerializeField]
+      Player OwnerPlayer;
+
+      Transform OwnerTransform;
+      Transform SelfTransform;
+
+      void Start()
+      {
+        SelfTransform = transform;
+      }
+
+      public void Initialize(Player player)
+      {
+        OwnerPlayer = player;
+        OwnerTransform = OwnerPlayer.transform;
+      }
+
+      void Update()
+      {
+        UpdatePosition();
+        UpdateHP();
+      }
+
+      void UpdatePosition()
+      {
+        if (OwnerTransform != null)
+          SelfTransform.position = Camera.main.WorldToScreenPoint(OwnerTransform.position);
+      }
+      void UpdateHP()
+      {
+        if(OwnerPlayer != null)
+        {
+          if (!OwnerPlayer.gameObject.activeSelf)
+            gameObject.SetActive(OwnerPlayer.gameObject.activeSelf);    //죽으면 같이 꺼진다.
+
+          HPGage.SetHP(OwnerPlayer.HPCurrent, OwnerPlayer.HpMax);
+        }
+      }
+    }
+    ```
+
+    </details>
+
+  - InGame 씬의 HPGage를 이용하여 편집 후 PlayerHUD 스크립트를 어태치해서 프리펩으로 저장
+  - Player 클래스에 InitializePlayerHUD 메소드 추가후 Initialize에서 호출
+    <details><summary>코드 보기</summary>
+
+    ```c#
+    //Player.cs -> Initialize()메소드 마지막 부분에 삽입
+    void InitializePlayerUHD()
+    {
+      InGameSceneMain inGameSceneMain = SystemManager.Instance.GetCurrentSceneMain<InGameSceneMain>();
+      GameObject go = Resources.Load<GameObject>(PlayerHUDPath);
+      GameObject goInstance = Instantiate<GameObject>(go, inGameSceneMain.DamageManager.CanvasTransform);
+      PlayerHUD playerHUD = goInstance.GetComponent<PlayerHUD>();
+      playerHUD.Initialize(this);
+    }
+    ```
+
+    </details>
+
+> **<h3>Realization</h3>**
+
+- null
+<details><summary>코드 보기</summary>
+
+```c#
+//Player.cs -> Initialize()메소드 마지막 부분에 삽입
+
+```
+
+</details>
